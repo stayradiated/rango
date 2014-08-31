@@ -1,4 +1,6 @@
 uncomplicate
 ============
 
-A cms written in go designed
+A simple cms written in go.
+
+It's designed for a photo gallery site.
