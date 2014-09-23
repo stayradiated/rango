@@ -1,6 +1,7 @@
-uncomplicate
-============
+rango
+=====
 
-A simple cms written in go.
+A web frontend for [hugo](https://gohugo.io).
 
-It's designed for a photo gallery site.
+It's designed to make it easy to manage a small site, even for people with
+little computer experience.
