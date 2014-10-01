@@ -6,6 +6,9 @@
 # Folders
 _obj
 _test
+node_modules
+client/dist/css/*.css
+client/dist/js/*.js
 
 # Architecture specific extensions/prefixes
 *.[568vq]
