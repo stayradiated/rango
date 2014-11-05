@@ -1,8 +1,9 @@
-var Reflux = require('reflux');
+'use strict';
 
-var actions = Reflux.createActions([
-  'changeName'
-]);
+var Constants = require('./constants');
 
-module.exports = actions;
-
+module.exports = {
+  changeName: function (name) {
+    this.dispatch(Constants.CHANGE_NAME, {name: name});
+  },
+};

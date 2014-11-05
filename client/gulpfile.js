@@ -1,6 +1,8 @@
+'use strict';
+
 var gulp         = require('gulp');
 var source       = require('vinyl-source-stream');
-var connect      = require('gulp-connect');
+var browserSync  = require('browser-sync');
 var sass         = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer');
 var reactify     = require('reactify');
@@ -11,10 +13,10 @@ var uglify       = require('gulp-uglify');
 gulp.task('default', ['lib', 'style'], function () {
   gulp.watch('./style/**/*.scss', ['style']);
 
-  return connect.server({
-    root: ['dist'],
-    port: 8000,
-    livereload: true
+  return browserSync({
+    server: {
+      baseDir: './dist/',
+    }
   });
 }); 
 
@@ -26,7 +28,7 @@ gulp.task('lib', function () {
     extensions: '.jsx'
   }));
 
-  bundler.add('./lib/main.js');
+  bundler.add('./lib/main.jsx');
   bundler.transform(reactify);
 
   bundler.on('update', rebundle);
@@ -39,7 +41,7 @@ gulp.task('lib', function () {
       })
       .pipe(source('main.js'))
       .pipe(gulp.dest('./dist/js'))
-      .pipe(connect.reload());
+      .pipe(browserSync.reload({stream: true}));
   }
 
   return rebundle();
@@ -50,7 +52,7 @@ gulp.task('style', function () {
     .pipe(sass({errLogToConsole: true, outputStyle: 'compressed'}))
     .pipe(autoprefixer())
     .pipe(gulp.dest('./dist/css'))
-    .pipe(connect.reload());
+    .pipe(browserSync.reload({stream: true}));
 });
 
 gulp.task('minify', function () {

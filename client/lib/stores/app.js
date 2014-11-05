@@ -1,26 +1,29 @@
-var Reflux = require('reflux');
+'use strict';
 
-var actions = require('../actions');
+var Fluxxor = require('fluxxor');
+var Constants = require('../constants');
 
-var state = {
-  name: 'Boiler: Web App'
-};
+var AppStore = Fluxxor.createStore({
 
-var appStore = Reflux.createStore({
+  initialize: function (options) {
+    this.name = options.name || '';
 
-  init: function () {
-    this.listenTo(actions.changeName, this.changeName);
+    this.bindActions(
+      Constants.CHANGE_NAME, this.handleChangeName
+    );
   },
 
-  changeName: function (name) {
-    state.name = name;
-    this.trigger(state);
+  getState: function () {
+    return {
+      name: this.name,
+    };
   },
 
-  getName: function () {
-    return state.name;
-  }
+  handleChangeName: function (payload) {
+    this.name = payload.name;
+    this.emit('change');
+  },
 
 });
 
-module.exports = appStore;
+module.exports = AppStore;

@@ -1,0 +1,85 @@
+.browser {
+  @include cf();
+
+  .browser-sidebar {
+    @include column(1/4);
+  }
+
+  .browser-table {
+    @include column(3/4);
+  }
+}
+
+.browser-sidebar {
+  background: $color_3;
+  border-radius: 4px;
+  padding: 20px;
+  box-sizing: border-box;
+
+  ul {
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    list-style-type: none;
+    font-weight: bold;
+    color: $color_2;
+    font-size: 14px;
+    line-height: 26px;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.browser-table {
+  table {
+    width: 100%;
+  }
+
+  th {
+    color: $color_6;
+  }
+
+  td {
+  }
+
+  td, th {
+    text-align: left;
+    font-size: 14px;
+    line-height: 45px;
+  }
+
+  tr {
+    border-bottom: 2px solid $color_4;
+  }
+
+  tbody tr {
+    cursor: pointer;
+
+    &:hover {
+      background: $color_3;
+    }
+
+    &:active {
+      background: $color_3;
+      color: $color_2;
+    }
+  }
+
+  td.name {
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  td.type {
+    font-family: 'entypo';
+    font-size: 36px;
+    color: $color_2;
+    text-align: center;
+    width: 50px;
+  }
+}

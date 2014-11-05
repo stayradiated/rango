@@ -1,0 +1,20 @@
+.editor {
+  @include cf();
+}
+
+.editor-metadata {
+  background: $color_3;
+  border-radius: 4px;
+  padding: 20px;
+  box-sizing: border-box;
+
+  @include column(1/4, $gutter: 1.5);
+}
+
+.editor-content {
+  @include column(3/4);
+
+  textarea {
+    min-height: 400px;
+  }
+}

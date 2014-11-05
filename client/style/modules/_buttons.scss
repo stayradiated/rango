@@ -1,0 +1,50 @@
+.button {
+  background: $color_6;
+
+  border: 0;
+  outline: 0;
+  border-radius: 4px;
+
+  color: $color_bg;
+  font-weight: bold;
+  font-size: 14px;
+
+  line-height: 40px;
+  padding: 0 40px;
+
+  transition: background 0.15s;
+
+  &:hover {
+    background: lighten($color_6, 5);
+  }
+
+  &:active {
+    color: darken($color_6, 20);
+    background: $color_6;
+    box-shadow: inset 0 1px 3px rgba(#000, 0.3);
+    transition-duration: 0;
+  }
+}
+
+.button-primary {
+  background: $color_1;
+
+  &:hover {
+    background: lighten($color_1, 5);
+  }
+
+  &:active {
+    color: darken($color_1, 20);
+    background: $color_1;
+  }
+}
+
+.button-group {
+  .button {
+    margin-left: 10px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}

@@ -1,0 +1,98 @@
+.input {
+  margin-bottom: 10px;
+
+  label {
+    display: block;
+    color: $color_6;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 21px;
+  }
+}
+
+.input-text {
+  input {
+    width: 100%;
+  }
+}
+
+.input-checkbox {
+  @include cf();
+
+  input {
+    float: left;
+    margin-right: 10px;
+  }
+  label {
+    float: left;
+    line-height: 16px;
+  }
+}
+
+input[type=text],
+input[type=password],
+input[type=date],
+input[type=email] {
+  display: block;
+  border: 2px solid $color_5;
+  border-radius: 4px;
+  height: 38px;
+  line-height: 19px;
+
+  padding: 0 10px;
+  font-weight: 600;
+  font-size: 14px;
+  outline: 0;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: $color_2;
+  }
+}
+
+input[type=checkbox] {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: $color_4;
+  border: 0;
+  outline: 0;
+  position: relative;
+
+  &:checked {
+    background: $color_0;
+
+    &:after {
+      content: '✓';
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 25px;
+      color: $color_bg;
+      font-family: 'entypo';
+      line-height: 16px;
+      width: 16px;
+      text-align: center;
+    }
+  }
+}
+
+.textarea {
+  textarea {
+    width: 100%;
+
+    padding: 20px;
+    box-sizing: border-box;
+    border: 2px solid $color_5;
+    border-radius: 4px;
+    font-family: 'source code pro', monaco, monospace;
+    font-weight: 500;
+    font-size: 14px;
+    outline: 0;
+
+    &:focus {
+      border-color: $color_2;
+    }
+  }
+}

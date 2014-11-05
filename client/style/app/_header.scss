@@ -1,0 +1,18 @@
+.app-header {
+  background: $color_3;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+
+  @include cf();
+
+  h1 {
+    float: left;
+    line-height: 40px;
+    margin: 0;
+  }
+
+  .button-group {
+    float: right;
+  }
+}
