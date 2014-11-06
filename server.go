@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	"github.com/stayradiated/rango/rangolib"
-	"net/http"
-	"os"
 )
 
 type catBody struct {
@@ -20,11 +21,9 @@ func main() {
 
 	r.HandleFunc("/ls", func(w http.ResponseWriter, req *http.Request) {
 		files := rangolib.Files()
-		output := make([]string, len(files))
-		for i, file := range files {
-			output[i] = file.Dir + file.LogicalName
-		}
-		json.NewEncoder(w).Encode(output)
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		json.NewEncoder(w).Encode(files)
 	})
 
 	r.HandleFunc("/cat", func(w http.ResponseWriter, req *http.Request) {

@@ -1,26 +1,27 @@
 'use strict';
 
-var Fluxxor = require('fluxxor');
+var jQuery    = require('jquery');
+var Fluxxor   = require('fluxxor');
 var Constants = require('../constants');
 
 var AppStore = Fluxxor.createStore({
 
-  initialize: function (options) {
-    this.name = options.name || '';
+  initialize: function () {
+    this.route = Constants.ROUTE_BROWSER;
 
     this.bindActions(
-      Constants.CHANGE_NAME, this.handleChangeName
+      Constants.OPEN_FILE, this.handleOpenFile
     );
   },
 
   getState: function () {
     return {
-      name: this.name,
+      route: this.route,
     };
   },
 
-  handleChangeName: function (payload) {
-    this.name = payload.name;
+  handleOpenFile: function () {
+    this.route = Constants.ROUTE_EDITOR;
     this.emit('change');
   },
 

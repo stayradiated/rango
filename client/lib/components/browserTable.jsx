@@ -1,15 +1,55 @@
 'use strict';
 
 var React = require('react');
+var Fluxxor   = require('fluxxor');
+var FluxMixin = Fluxxor.FluxMixin(React);
 
-var BrowserRow = require('./browserRow');
+var BrowserDirectory = require('./browserDirectory');
+var BrowserFile = require('./browserFile');
 
 var BrowserTable = React.createClass({
+  mixins: [FluxMixin],
 
   propTypes: {
+    browser: React.PropTypes.object.isRequired,
   },
 
   render: function () {
+    var rows = [];
+    var contents = this.props.browser.contents;
+
+    if (! this.props.browser.isRoot) {
+      rows.push(
+        <BrowserDirectory
+          key='..'
+          item={{name: '..'}}
+          onClick={this.onOpenParentClick}
+        />
+      );
+    };
+
+    for (var i = 0, len = contents.directories.length; i < len; i++) {
+      var dirItem = contents.directories[i];
+      rows.push(
+        <BrowserDirectory
+          key={dirItem.name}
+          item={dirItem}
+          onClick={this.onDirectoryClick.bind(null, dirItem.name)}
+        />
+      );
+    }
+
+    for (var i = 0, len = contents.files.length; i < len; i++) {
+      var fileItem = contents.files[i];
+      rows.push(
+        <BrowserFile
+          key={fileItem.name}
+          item={fileItem}
+          onClick={this.onFileClick.bind(null, fileItem.name)}
+        />
+      );
+    }
+
     return (
       <div className='browser-table'>
         <table>
@@ -23,15 +63,23 @@ var BrowserTable = React.createClass({
             </tr>
           </thead>
           <tbody>
-            <BrowserRow type='folder' name='Gallery' lastModified='27th Sep 2014' />
-            <BrowserRow type='folder' name='Blog' lastModified='1st Oct 2014' />
-            <BrowserRow type='page' name='About' lastModified='9th Sep 2014' />
-            <BrowserRow type='page' name='Bio' lastModified='7th Sep 2014' />
-            <BrowserRow type='page' name='Contact' lastModified='1st Sep 2014' />
+            {rows}
           </tbody>
         </table>
       </div>
     );
+  },
+
+  onFileClick: function (name) {
+    this.getFlux().actions.openFile(name);
+  },
+
+  onDirectoryClick: function (name) {
+    this.getFlux().actions.openDirectory(name);
+  },
+
+  onOpenParentClick: function () {
+    this.getFlux().actions.openParentDirectory();
   },
 
 });

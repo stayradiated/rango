@@ -8,13 +8,14 @@ var BrowserTable = require('./browserTable');
 var Browser = React.createClass({
 
   propTypes: {
+    browser: React.PropTypes.object.isRequired,
   },
 
   render: function () {
     return (
       <div className='browser'>
         <BrowserSidebar />
-        <BrowserTable />
+        <BrowserTable browser={this.props.browser} />
       </div>
     );
   },
