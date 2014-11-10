@@ -1,11 +1,9 @@
 package rangolib
 
 import (
-	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/spf13/cast"
@@ -15,124 +13,58 @@ import (
 const TOML = '+'
 
 type Page struct {
-	Metadata map[string]interface{}
-	Content  string
+	Metadata map[string]interface{} `json:"metadata"`
+	Content  string                 `json:"content"`
 }
 
 type DirItem struct {
-	Name     string    `json:"name"`
-	Contents *PathList `json:"contents"`
+	Name string `json:"name"`
 }
 
-type FileItem struct {
+type PageItem struct {
 	Name    string    `json:"name"`
 	ModTime time.Time `json:"modified_at"`
 }
 
 type PathList struct {
 	Directories []*DirItem  `json:"directories"`
-	Files       []*FileItem `json:"files"`
+	Pages       []*PageItem `json:"pages"`
 }
 
 func NewPathList() *PathList {
 	pathList := new(PathList)
 	pathList.Directories = make([]*DirItem, 0)
-	pathList.Files = make([]*FileItem, 0)
+	pathList.Pages = make([]*PageItem, 0)
 	return pathList
 }
 
-func (p *PathList) Add(filePath string, fi os.FileInfo) {
-	sections := make([]string, 0)
-	name := ""
-
-	for {
-		filePath, name = filepath.Split(filePath)
-		sections = append([]string{name}, sections...)
-		filePath = strings.Trim(filePath, "/")
-		if len(filePath) == 0 {
-			break
-		}
-	}
-
-	pathList := p
-	length := len(sections)
-	isFile := !fi.IsDir()
-
-	for i, path := range sections {
-
-		if isFile && i == length-1 {
-			pathList.Files = append(pathList.Files, &FileItem{
-				Name:    path,
-				ModTime: fi.ModTime(),
-			})
-
-		} else {
-
-			found := false
-
-			for _, dirItem := range pathList.Directories {
-				if dirItem.Name == path {
-					pathList = dirItem.Contents
-					found = true
-					break
-				}
-			}
-
-			if found {
-				continue
-			}
-
-			newPathList := NewPathList()
-			newDirItem := &DirItem{
-				Name:     path,
-				Contents: newPathList,
-			}
-
-			pathList.Directories = append(pathList.Directories, newDirItem)
-			pathList = newPathList
-		}
+func (p *PathList) AddFile(fi os.FileInfo) {
+	name := fi.Name()
+	if fi.IsDir() {
+		p.Directories = append(p.Directories, &DirItem{
+			Name: name,
+		})
+	} else {
+		p.Pages = append(p.Pages, &PageItem{
+			Name:    name,
+			ModTime: fi.ModTime(),
+		})
 	}
 }
 
-func Files() *PathList {
-	root := NewPathList()
-	baseDir := "content"
+func Files(path string) (*PathList, error) {
+	pathList := NewPathList()
+	files, err := ioutil.ReadDir(path)
 
-	filepath.Walk(baseDir, func(filePath string, fi os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-
-		if fi.IsDir() && isNonProcessablePath(filePath) {
-			return filepath.SkipDir
-		} else if isNonProcessablePath(filePath) {
-			return nil
-		}
-
-		root.Add(filePath, fi)
-		return nil
-	})
-
-	// return the contents of the baseDir directory
-	return root.Directories[0].Contents
-}
-
-func isNonProcessablePath(filePath string) bool {
-	base := filepath.Base(filePath)
-	fmt.Println(base)
-	if base[0] == '.' {
-		return true
+	if err != nil {
+		return nil, err
 	}
 
-	if base[0] == '#' {
-		return true
+	for _, f := range files {
+		pathList.AddFile(f)
 	}
 
-	if base[len(base)-1] == '~' {
-		return true
-	}
-
-	return false
+	return pathList, nil
 }
 
 func Read(file io.Reader) (page *Page, err error) {
