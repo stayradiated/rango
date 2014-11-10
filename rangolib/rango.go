@@ -1,12 +1,15 @@
 package rangolib
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"os"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/spf13/cast"
+	"github.com/spf13/hugo/hugolib"
 	"github.com/spf13/hugo/parser"
 )
 
@@ -89,63 +92,41 @@ func Read(file io.Reader) (page *Page, err error) {
 	}, nil
 }
 
-// func main() {
-//
-// 	files := Files()
-//
-// 	for _, file := range files {
-//
-// 		fmt.Println("Modifying: " + file.LogicalName())
-//
-// 		/* READING METADATA */
-//
-// 		psr, err := parser.ReadFrom(file.Contents)
-// 		if err != nil {
-// 			panic(err)
-// 		}
-//
-// 		metadata, err := psr.Metadata()
-// 		if err != nil {
-// 			panic(err)
-// 		}
-//
-// 		metadata, err = cast.ToStringMapE(metadata)
-// 		if err != nil {
-// 			panic(err)
-// 		}
-//
-// 		/* WRITING METADATA */
-//
-// 		page, err := hugolib.NewPage(file.LogicalName())
-// 		if err != nil {
-// 			panic(err)
-// 		}
-//
-// 		// page.Dir = file.Dir
-// 		page.SetSourceContent(psr.Content())
-// 		page.SetSourceMetaData(metadata, TOML)
-//
-// 		page.SaveSourceAs(path.Join("content", page.FullFilePath()))
-//
-// 	}
-//
-// 	/* CONFIG */
-//
-// 	datum, err := ioutil.ReadFile("config.toml")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	config := map[string]interface{}{}
-// 	if _, err := toml.Decode(string(datum), &config); err != nil {
-// 		panic(err)
-// 	}
-//
-// 	// editing the config
-// 	config["random"] = "Something silly"
-//
-// 	buf := new(bytes.Buffer)
-// 	if err := toml.NewEncoder(buf).Encode(config); err != nil {
-// 		panic(err)
-// 	}
-// 	ioutil.WriteFile("config.toml", buf.Bytes(), 0644)
-// }
+func Save(name string, metadata map[string]interface{}, content []byte) error {
+	page, err := hugolib.NewPage(name)
+	if err != nil {
+		return err
+	}
+
+	page.SetSourceMetaData(metadata, TOML)
+	page.SetSourceContent(content)
+
+	if err = page.SafeSaveSourceAs(name); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ReadConfig() (map[string]interface{}, error) {
+	config := map[string]interface{}{}
+	datum, err := ioutil.ReadFile("config.toml")
+	if err != nil {
+		return config, err
+	}
+	if _, err := toml.Decode(string(datum), &config); err != nil {
+		return config, err
+	}
+	return config, nil
+}
+
+func SaveConfig(config map[string]interface{}) error {
+	buf := new(bytes.Buffer)
+	if err := toml.NewEncoder(buf).Encode(config); err != nil {
+		return err
+	}
+	if err := ioutil.WriteFile("config.toml", buf.Bytes(), 0644); err != nil {
+		return err
+	}
+	return nil
+}
