@@ -10,7 +10,9 @@ var AppStore = Fluxxor.createStore({
     this.route = Constants.ROUTE_BROWSER;
 
     this.bindActions(
-      Constants.OPEN_FILE, this.handleOpenFile
+      Constants.OPEN_PATH, this.handleOpenBrowser,
+      Constants.OPEN_DIRECTORY, this.handleOpenBrowser,
+      Constants.OPEN_PAGE, this.handleOpenEditor
     );
   },
 
@@ -20,7 +22,12 @@ var AppStore = Fluxxor.createStore({
     };
   },
 
-  handleOpenFile: function () {
+  handleOpenBrowser: function () {
+    this.route = Constants.ROUTE_BROWSER;
+    this.emit('change');
+  },
+
+  handleOpenEditor: function () {
     this.route = Constants.ROUTE_EDITOR;
     this.emit('change');
   },

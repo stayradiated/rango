@@ -29,23 +29,23 @@ var BrowserTable = React.createClass({
     };
 
     for (var i = 0, len = contents.directories.length; i < len; i++) {
-      var dirItem = contents.directories[i];
+      var dir = contents.directories[i];
       rows.push(
         <BrowserDirectory
-          key={dirItem.name}
-          item={dirItem}
-          onClick={this.onDirectoryClick.bind(null, dirItem.name)}
+          key={dir.name}
+          item={dir}
+          onClick={this.onDirectoryClick.bind(null, dir)}
         />
       );
     }
 
-    for (var i = 0, len = contents.files.length; i < len; i++) {
-      var fileItem = contents.files[i];
+    for (var i = 0, len = contents.pages.length; i < len; i++) {
+      var page = contents.pages[i];
       rows.push(
         <BrowserFile
-          key={fileItem.name}
-          item={fileItem}
-          onClick={this.onFileClick.bind(null, fileItem.name)}
+          key={page.name}
+          item={page}
+          onClick={this.onFileClick.bind(null, page)}
         />
       );
     }
@@ -70,12 +70,12 @@ var BrowserTable = React.createClass({
     );
   },
 
-  onFileClick: function (name) {
-    this.getFlux().actions.openFile(name);
+  onFileClick: function (file) {
+    this.getFlux().actions.openPage(file.path);
   },
 
-  onDirectoryClick: function (name) {
-    this.getFlux().actions.openDirectory(name);
+  onDirectoryClick: function (dir) {
+    this.getFlux().actions.openDirectory(dir.path);
   },
 
   onOpenParentClick: function () {

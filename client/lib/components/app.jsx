@@ -11,12 +11,13 @@ var Editor    = require('./editor');
 var Constants = require('../constants');
 
 var App = React.createClass({
-  mixins: [FluxMixin, StoreWatchMixin('App', 'Browser')],
+  mixins: [FluxMixin, StoreWatchMixin('App', 'Browser', 'Editor')],
 
   getStateFromFlux: function () {
     var flux = this.getFlux();
     return {
       app: flux.store('App').getState(),
+      editor: flux.store('Editor').getState(),
       browser: flux.store('Browser').getState(),
     };
   },
@@ -29,13 +30,13 @@ var App = React.createClass({
         view = <Browser browser={this.state.browser} />
         break;
       case Constants.ROUTE_EDITOR:
-        view = <Editor />
+        view = <Editor editor={this.state.editor} />
         break;
     }
 
     return (
       <div className='app'>
-        <Header />
+        <Header browser={this.state.browser} />
         {view}
       </div>
     );

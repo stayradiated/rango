@@ -4,24 +4,27 @@ var jQuery    = require('jquery');
 var Fluxxor   = require('fluxxor');
 var Constants = require('../constants');
 
+var PAGES_URL = './api/files/';
+
 var BrowserStore = Fluxxor.createStore({
 
   initialize: function () {
-    this.root = {
-      directories: [],
-      files: [],
-    };
-    this.contents = this.root;
+    // a stack storing the current path stored in an array
+    // /usr/local/bin => ['usr', 'local', 'bin']
     this.path = [];
 
-    var self = this;
-    jQuery.get('http://localhost:8080/ls').then(function (response) {
-      self.root = response;
-      self.contents = response;
-      self.emit('change');
-    });
+    // the directories and pages in the current path
+    this.contents = {
+      directories: [],
+      pages: [],
+    };
 
+    // fetch contents of root directory
+    this.fetchContents();
+
+    // listen to actions
     this.bindActions(
+      Constants.OPEN_PATH, this.handleOpenPath,
       Constants.OPEN_DIRECTORY, this.handleOpenDirectory,
       Constants.OPEN_PARENT_DIRECTORY, this.handleOpenParentDirectory
     );
@@ -29,47 +32,37 @@ var BrowserStore = Fluxxor.createStore({
 
   getState: function () {
     return {
-      root: this.root,
-      contents: this.contents,
-      isRoot: this.path.length === 0,
+      path:      this.path,
+      contents:  this.contents,
+      isRoot:    this.path.length === 0,
     };
   },
 
-  getContentsFromPath: function () {
-    var pathList = this.root;
-    for (var i = 0, lenI = this.path.length; i < lenI; i++) {
-      var directoryName = this.path[i];
+  fetchContents: function () {
+    var self = this;
 
-      for (var k = 0, lenK = pathList.directories.length; k < lenK; k++) {
-        var item = pathList.directories[k];
+    var path = this.path.join('/');
+    var url = PAGES_URL + path;
 
-        if (item.name === directoryName) {
-          pathList = item.contents;
-          break;
-        }
-      }
-    }
-    return pathList;
+    jQuery.get(url).then(function (response) {
+      self.contents = response;
+      self.emit('change');
+    });
   },
 
-  handleOpenDirectory: function (directoryName) {
-    var dirList = this.contents.directories;
-    for (var i = 0, len = dirList.length; i < len; i++) {
-      var dirItem = dirList[i];
+  handleOpenPath: function (path) {
+    this.path = path;
+    this.fetchContents();
+  },
 
-      if (dirItem.name === directoryName) {
-        this.path.push(directoryName);
-        this.contents = dirItem.contents;
-        this.emit('change');
-        break;
-      }
-    }
+  handleOpenDirectory: function (dirName) {
+    this.path.push(dirName);
+    this.fetchContents();
   },
 
   handleOpenParentDirectory: function () {
-    this.path = this.path.slice(0, -1);
-    this.contents = this.getContentsFromPath();
-    this.emit('change');
+    this.path.pop();
+    this.fetchContents();
   },
 
 });

@@ -5,6 +5,8 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
+	"strings"
 	"time"
 
 	"github.com/BurntSushi/toml"
@@ -22,11 +24,13 @@ type Page struct {
 
 type DirItem struct {
 	Name string `json:"name"`
+	Path string `json:"path"`
 }
 
 type PageItem struct {
 	Name    string    `json:"name"`
 	ModTime time.Time `json:"modified_at"`
+	Path    string    `json:"path"`
 }
 
 type PathList struct {
@@ -41,30 +45,34 @@ func NewPathList() *PathList {
 	return pathList
 }
 
-func (p *PathList) AddFile(fi os.FileInfo) {
+func (p *PathList) AddFile(fp string, fi os.FileInfo) {
 	name := fi.Name()
+
 	if fi.IsDir() {
 		p.Directories = append(p.Directories, &DirItem{
 			Name: name,
+			Path: fp,
 		})
 	} else {
 		p.Pages = append(p.Pages, &PageItem{
 			Name:    name,
 			ModTime: fi.ModTime(),
+			Path:    fp,
 		})
 	}
 }
 
-func Files(path string) (*PathList, error) {
+func Files(folder string) (*PathList, error) {
 	pathList := NewPathList()
-	files, err := ioutil.ReadDir(path)
+	files, err := ioutil.ReadDir(folder)
 
 	if err != nil {
 		return nil, err
 	}
 
 	for _, f := range files {
-		pathList.AddFile(f)
+		fp := strings.TrimPrefix(path.Join(folder, f.Name()), "content/")
+		pathList.AddFile(fp, f)
 	}
 
 	return pathList, nil

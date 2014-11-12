@@ -8,13 +8,14 @@ var EditorContent = require('./editorContent');
 var Editor = React.createClass({
 
   propTypes: {
+    editor: React.PropTypes.object.isRequired,
   },
 
   render: function () {
     return (
       <div className='editor'>
-        <EditorMetadata />
-        <EditorContent />
+        <EditorMetadata page={this.props.editor.page} />
+        <EditorContent page={this.props.editor.page} />
       </div>
     );
   },

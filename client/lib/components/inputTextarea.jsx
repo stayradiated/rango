@@ -2,7 +2,7 @@
 
 var React = require('react');
 
-var InputText = React.createClass({
+var InputTextarea = React.createClass({
 
   propTypes: {
     label: React.PropTypes.string.isRequired,
@@ -23,8 +23,7 @@ var InputText = React.createClass({
     return (
       <div className='input input-text'>
         <label>{ this.props.label }</label>
-        <input
-          type='text'
+        <textarea
           ref='input'
           value={this.state.value}
           onChange={this.onChange}
@@ -44,4 +43,4 @@ var InputText = React.createClass({
 
 });
 
-module.exports = InputText;
+module.exports = InputTextarea;

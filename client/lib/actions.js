@@ -12,8 +12,12 @@ module.exports = {
     this.dispatch(Constants.OPEN_PARENT_DIRECTORY);
   },
 
-  openFile: function (fileName) {
-    this.dispatch(Constants.OPEN_FILE, fileName);
+  openPage: function (fileName) {
+    this.dispatch(Constants.OPEN_PAGE, fileName);
   },
+
+  openPath: function (path) {
+    this.dispatch(Constants.OPEN_PATH, path);
+  }
 
 };

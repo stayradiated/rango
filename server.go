@@ -21,13 +21,18 @@ type catBody struct {
 func main() {
 
 	r := mux.NewRouter()
+	s := r.PathPrefix("/api").Subrouter()
 
-	r.HandleFunc("/pages", getPages).Methods("GET")
-	r.HandleFunc("/page", getPage).Methods("GET")
-	r.HandleFunc("/page", setPage).Methods("POST")
+	s.HandleFunc("/files/{path:.*}", getFiles).Methods("GET")
 
-	r.HandleFunc("/config", getConfig).Methods("GET")
-	r.HandleFunc("/config", setConfig).Methods("POST")
+	s.HandleFunc("/page/{path:.*}", getPage).Methods("GET")
+	s.HandleFunc("/page/{path:.*}", setPage).Methods("POST")
+	s.HandleFunc("/page/{path:.*}", updatePage).Methods("PUT")
+
+	s.HandleFunc("/config", getConfig).Methods("GET")
+	s.HandleFunc("/config", setConfig).Methods("POST")
+
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./client/dist/")))
 
 	n := negroni.Classic()
 	n.UseHandler(r)
@@ -35,8 +40,8 @@ func main() {
 
 }
 
-func getPages(w http.ResponseWriter, req *http.Request) {
-	fp, err := sanitizePath(req.FormValue("path"))
+func getFiles(w http.ResponseWriter, req *http.Request) {
+	fp, err := sanitizePath(mux.Vars(req)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -52,7 +57,7 @@ func getPages(w http.ResponseWriter, req *http.Request) {
 }
 
 func getPage(w http.ResponseWriter, req *http.Request) {
-	fp, err := sanitizePath(req.FormValue("path"))
+	fp, err := sanitizePath(mux.Vars(req)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -74,7 +79,7 @@ func getPage(w http.ResponseWriter, req *http.Request) {
 }
 
 func setPage(w http.ResponseWriter, req *http.Request) {
-	fp, err := sanitizePath(req.FormValue("path"))
+	fp, err := sanitizePath(mux.Vars(req)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -90,6 +95,14 @@ func setPage(w http.ResponseWriter, req *http.Request) {
 	content := []byte(req.FormValue("content"))
 
 	rangolib.Save(fp, metadata, content)
+}
+
+func updatePage(w http.ResponseWriter, req *http.Request) {
+	location := req.Header.Get("Content-Location")
+	vars := mux.Vars(req)
+	if len(location) > 0 {
+		fmt.Fprint(w, "Moving file from "+location+" to "+vars["path"])
+	}
 }
 
 func getConfig(w http.ResponseWriter, req *http.Request) {

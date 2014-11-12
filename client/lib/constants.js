@@ -1,11 +1,11 @@
 'use strict';
-
 [
 
+  'OPEN_PATH',
   'OPEN_DIRECTORY',
   'OPEN_PARENT_DIRECTORY',
   
-  'OPEN_FILE',
+  'OPEN_PAGE',
 
   'ROUTE_BROWSER',
   'ROUTE_EDITOR',
