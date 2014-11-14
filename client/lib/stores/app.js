@@ -13,11 +13,11 @@ var AppStore = Fluxxor.createStore({
       route: Constants.ROUTE_BROWSER,
     });
 
-    this.bindActions(
-      Constants.OPEN_PATH, this.handleOpenBrowser,
-      Constants.OPEN_DIRECTORY, this.handleOpenBrowser,
-      Constants.OPEN_PAGE, this.handleOpenEditor
-    );
+    this.bindActions({
+      OPEN_PATH:       'handleOpenBrowser',
+      OPEN_DIRECTORY:  'handleOpenBrowser',
+      OPEN_PAGE:       'handleOpenEditor',
+    });
   },
 
   handleOpenBrowser: function () {

@@ -23,12 +23,12 @@ var EditorStore = Fluxxor.createStore({
 
     });
 
-    // listen to actions
-    this.bindActions(
-      Constants.OPEN_PAGE, this.handleOpenPage
-    );
+    this.bindActions({
+      OPEN_PAGE: 'handleOpenPage',
+    });
   },
 
+  // fetch the page metadata and content from the server
   fetchPage: function () {
     var self = this;
 
@@ -45,6 +45,7 @@ var EditorStore = Fluxxor.createStore({
     });
   },
 
+  // open a page in the editor
   handleOpenPage: function (filename) {
     this.state = this.state.set('path', filename);
     this.fetchPage();

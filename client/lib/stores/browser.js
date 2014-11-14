@@ -14,15 +14,15 @@ var BrowserStore = Fluxxor.createStore({
 
     this.state = Immutable.fromJS({
 
-      // a stack storing the current path stored in an array
+      // a list storing the current path stored in an array
       // /usr/local/bin => ['usr', 'local', 'bin']
-      path: Immutable.List(),
+      path: [],
 
       // the directories and pages in the current path
-      contents: Immutable.fromJS({
+      contents: {
         directories: [],
         pages: [],
-      }),
+      },
 
       // a set of selected pages and directories
       selected: Immutable.Set(),
@@ -32,21 +32,21 @@ var BrowserStore = Fluxxor.createStore({
     // fetch contents of root directory
     this.fetchContents();
 
-    // listen to actions
-    this.bindActions(
-      Constants.OPEN_PATH, this.handleOpenPath,
-      Constants.OPEN_DIRECTORY, this.handleOpenDirectory,
+    this.bindActions({
+      OPEN_PATH:              'handleOpenPath',
+      OPEN_DIRECTORY:         'handleOpenDirectory',
 
-      Constants.CREATE_PAGE, this.handleCreatePage,
-      Constants.CREATE_DIRECTORY, this.handleCreateDirectory,
+      CREATE_PAGE:            'handleCreatePage',
+      CREATE_DIRECTORY:       'handleCreateDirectory',
 
-      Constants.OPEN_PARENT_DIRECTORY, this.handleOpenParentDirectory,
-      Constants.SELECT_FILE, this.handleSelectFile,
-      Constants.DESELECT_ALL, this.handleDeselectAll,
-      Constants.REMOVE_SELECTED_FILES, this.handleRemoveSelectedFiles
-    );
+      OPEN_PARENT_DIRECTORY:  'handleOpenParentDirectory',
+      SELECT_FILE:            'handleSelectFile',
+      DESELECT_ALL:           'handleDeselectAll',
+      REMOVE_SELECTED_FILES:  'handleRemoveSelectedFiles',
+    });
   },
 
+  // get the current path as a string, also handles root directory properly
   getPath: function () {
     var path = this.state.get('path');
 
@@ -57,6 +57,7 @@ var BrowserStore = Fluxxor.createStore({
     }
   },
 
+  // get contents of current path from server
   fetchContents: function () {
     var self = this;
     return Rango.readDir(this.getPath()).then(function (data) {
@@ -68,6 +69,7 @@ var BrowserStore = Fluxxor.createStore({
     });
   },
 
+  // change the path
   handleOpenPath: function (newPath) {
     this.state = this.state.update('path', function (path) {
       if (newPath === '/') {
@@ -79,6 +81,7 @@ var BrowserStore = Fluxxor.createStore({
     this.fetchContents();
   },
 
+  // open a sub-directory
   handleOpenDirectory: function (dirName) {
     this.state = this.state.update('path', function (path) {
       return path.push(dirName);
@@ -86,6 +89,7 @@ var BrowserStore = Fluxxor.createStore({
     this.fetchContents();
   },
 
+  // open the parent directory
   handleOpenParentDirectory: function () {
     this.state = this.state.update('path', function (path) {
       return path.pop();
@@ -93,6 +97,7 @@ var BrowserStore = Fluxxor.createStore({
     this.fetchContents();
   },
 
+  // create a new directory on the server
   handleCreateDirectory: function () {
     var self = this;
 
@@ -106,6 +111,7 @@ var BrowserStore = Fluxxor.createStore({
     });
   },
 
+  // create a new page on the server
   handleCreatePage: function () {
     var self = this;
 
@@ -125,6 +131,7 @@ var BrowserStore = Fluxxor.createStore({
     });
   },
 
+  // select a file
   handleSelectFile: function (file) {
     this.state = this.state.update('selected', function (selected) {
       return selected.clear().add(file);
@@ -132,6 +139,7 @@ var BrowserStore = Fluxxor.createStore({
     this.emit('change');
   },
 
+  // deselect all files
   handleDeselectAll: function () {
     this.state = this.state.update('selected', function (selected) {
       return selected.clear();
@@ -139,6 +147,7 @@ var BrowserStore = Fluxxor.createStore({
     this.emit('change');
   },
 
+  // delete the selected files
   handleRemoveSelectedFiles: function () {
     if (! window.confirm('Are you sure you want to delete the selected files?')) {
       return;

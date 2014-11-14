@@ -1,6 +1,7 @@
 'use strict';
 
-var Fluxxor = require('fluxxor');
+var Immutable = require('immutable');
+var Fluxxor   = require('fluxxor');
 
 var Constants = require('../constants');
 var Rango     = require('../api');
@@ -8,19 +9,19 @@ var Rango     = require('../api');
 var ConfigStore = Fluxxor.createStore({
 
   initialize: function () {
-    this.config = {
+    this.config = Immutable.fromJS({
       types: {
         default: {
         },
       },
-    };
+    });
 
-    // fetch contents of root directory
+    // fetch config from server
     this.fetchConfig();
 
-    // listen to actions
-    this.bindActions(
-    );
+    this.bindActions({
+
+    });
   },
 
   getState: function () {
@@ -32,7 +33,7 @@ var ConfigStore = Fluxxor.createStore({
   fetchConfig: function () { 
     var self = this;
     return Rango.readConfig().then(function (config) {
-      self.config = config;
+      self.config = Immutable.fromJS(config);
       self.emit('change');
     });
   },
