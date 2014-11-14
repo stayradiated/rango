@@ -23,30 +23,42 @@
   }
 
   h1, span {
-    color: $color_b;
+    $sep_width: 20px;
+
+    color: $color_a;
     font-size: 20px;
     float: left;
     font-weight: bold;
-    padding: 0 10px;
-    border-radius: 50px;
     position: relative;
-    margin-right: 20px;
+    border-radius: 5px;
+
+    padding: 0 10px;
+    margin-right: $sep_width;
+
+    transition: background 0.15s;
 
     &:hover {
       background: $color_1;
     }
 
+    &:active {
+      box-shadow: inset 0 1px 3px rgba(#000, 0.1);
+      transition-duration: 0;
+    }
+
     &:after {
       display: block;
       position: absolute;
-      right: -20px;
+      right: -$sep_width;
       top: 0;
 
       content: '';
+      width: $sep_width;
+      text-align: center;
+
       font-family: 'entypo';
       font-size: 25px;
       color: $color_c;
-      margin: 0 10px;
     }
 
     &:last-child {
