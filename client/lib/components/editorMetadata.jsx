@@ -22,9 +22,9 @@ var EditorMetadata = React.createClass({
       type: meta.type || '',
     };
 
-    for (var key in meta) {
-      data[key] = meta[key];
-    }
+    // for (var key in meta) {
+    //   data[key] = meta[key];
+    // }
 
     var inputs = [];
     for (var key in data) {

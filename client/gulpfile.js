@@ -12,13 +12,21 @@ var uglify       = require('gulp-uglify');
 
 gulp.task('default', ['lib', 'style'], function () {
   gulp.watch('./style/**/*.scss', ['style']);
+});
 
+gulp.task('server', ['default'], function () {
   return browserSync({
     server: {
       baseDir: './dist/',
     }
   });
 }); 
+
+gulp.task('proxy', ['default'], function () {
+  return browserSync({
+    proxy: 'localhost:8080',
+  });
+});
 
 gulp.task('lib', function () {
   var bundler = watchify(browserify({

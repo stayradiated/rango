@@ -1,11 +1,12 @@
 'use strict';
 
-var React = require('react');
+var React     = require('react');
 var Fluxxor   = require('fluxxor');
 var FluxMixin = Fluxxor.FluxMixin(React);
 
+var Constants        = require('../constants');
 var BrowserDirectory = require('./browserDirectory');
-var BrowserFile = require('./browserFile');
+var BrowserFile      = require('./browserFile');
 
 var BrowserTable = React.createClass({
   mixins: [FluxMixin],
@@ -17,16 +18,7 @@ var BrowserTable = React.createClass({
   render: function () {
     var rows = [];
     var contents = this.props.browser.contents;
-
-    if (! this.props.browser.isRoot) {
-      rows.push(
-        <BrowserDirectory
-          key='..'
-          item={{name: '..'}}
-          onClick={this.onOpenParentClick}
-        />
-      );
-    };
+    var selected = this.props.browser.selected;
 
     for (var i = 0, len = contents.directories.length; i < len; i++) {
       var dir = contents.directories[i];
@@ -34,7 +26,7 @@ var BrowserTable = React.createClass({
         <BrowserDirectory
           key={dir.name}
           item={dir}
-          onClick={this.onDirectoryClick.bind(null, dir)}
+          selected={selected.contains(dir.name)}
         />
       );
     }
@@ -45,13 +37,13 @@ var BrowserTable = React.createClass({
         <BrowserFile
           key={page.name}
           item={page}
-          onClick={this.onFileClick.bind(null, page)}
+          selected={selected.contains(page.name)}
         />
       );
     }
 
     return (
-      <div className='browser-table'>
+      <div onClick={this.onClick} className='browser-table'>
         <table>
           <thead>
             <tr>
@@ -70,16 +62,8 @@ var BrowserTable = React.createClass({
     );
   },
 
-  onFileClick: function (file) {
-    this.getFlux().actions.openPage(file.path);
-  },
-
-  onDirectoryClick: function (dir) {
-    this.getFlux().actions.openDirectory(dir.path);
-  },
-
-  onOpenParentClick: function () {
-    this.getFlux().actions.openParentDirectory();
+  onClick: function () {
+    this.getFlux().actions.deselectAll();
   },
 
 });

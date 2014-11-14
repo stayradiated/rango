@@ -7,8 +7,14 @@ body {
   top: 0;
   bottom: 0;
   width: 100%;
+
+  color: $color_fg;
+  background: $color_bg;
 }
 
-.app {
-  padding: 20px;
+.route {
+  position: fixed;
+  top: $header_height;
+  bottom: 0;
+  width: 100%;
 }

@@ -1,20 +1,96 @@
-.editor {
-  @include cf();
-}
+$sidebar_width: 300px;
 
 .editor-metadata {
-  background: $color_3;
-  border-radius: 4px;
-  padding: 20px;
-  box-sizing: border-box;
+  position: absolute;
 
-  @include column(1/4, $gutter: 1.5);
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: $sidebar_width;
+
+  background: $color_0;
+  padding: 20px;
+  border-right: 2px solid $color_1;
+  box-sizing: border-box;
 }
 
 .editor-content {
-  @include column(3/4);
+  position: absolute;
 
-  textarea {
-    min-height: 400px;
+  top: 0;
+  left: $sidebar_width;
+  right: 0;
+  bottom: 0;
+
+  box-sizing: border-box;
+}
+
+.editor-code {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  bottom: 0;
+}
+
+.editor-preview {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  bottom: 0;
+
+  overflow-y: auto;
+
+  padding: 0 1em;
+  border-left: 2px solid $color_1;
+  box-sizing: border-box;
+
+  font-size: 16px;
+  line-height: 24px;
+
+  blockquote {
+    border-left: 4px solid $color_a;
+    margin-left: 0;
+    padding-left: 20px;
   }
+
+  a {
+    color: $color_c;
+  }
+
+  h2 {
+    margin: 0;
+    text-transform: none;
+    font-size: 20px;  
+    font-weight: bold;
+  }
+
+  hr {
+    height: 2px;
+    background: $color_1;
+    border: 0;
+    outline: 0;
+  }
+}
+
+.CodeMirror {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  padding: 20px;
+  height: auto;
+
+  font-family: 'latinmodernmono', monospace;
+  font-size: 16px;
+  line-height: 24px;
+  background: $color_bg;
+}
+
+.cm-header, .cm-strong {
+  font-weight: 700;
 }

@@ -1,10 +1,9 @@
 'use strict';
 
-var jQuery    = require('jquery');
-var Fluxxor   = require('fluxxor');
-var Constants = require('../constants');
+var Fluxxor = require('fluxxor');
 
-var PAGE_URL = './api/page/';
+var Constants = require('../constants');
+var Rango     = require('../api');
 
 var EditorStore = Fluxxor.createStore({
 
@@ -41,10 +40,8 @@ var EditorStore = Fluxxor.createStore({
     };
     self.emit('change');
 
-    var url = PAGE_URL + this.path;
-
-    jQuery.get(url).then(function (response) {
-      self.page = response;
+    Rango.readPage(this.path).then(function (page) {
+      self.page = page ;
       self.emit('change');
     });
   },

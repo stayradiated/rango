@@ -1,10 +1,12 @@
 'use strict';
 
-var jQuery    = require('jquery');
+var Immutable = require('immutable');
 var Fluxxor   = require('fluxxor');
-var Constants = require('../constants');
+var Path      = require('path')
+var jQuery    = require('jquery');
 
-var PAGES_URL = './api/files/';
+var Constants = require('../constants');
+var Rango     = require('../api');
 
 var BrowserStore = Fluxxor.createStore({
 
@@ -19,6 +21,9 @@ var BrowserStore = Fluxxor.createStore({
       pages: [],
     };
 
+    // a set of selected pages and directories
+    this.selected = Immutable.Set();
+
     // fetch contents of root directory
     this.fetchContents();
 
@@ -26,7 +31,14 @@ var BrowserStore = Fluxxor.createStore({
     this.bindActions(
       Constants.OPEN_PATH, this.handleOpenPath,
       Constants.OPEN_DIRECTORY, this.handleOpenDirectory,
-      Constants.OPEN_PARENT_DIRECTORY, this.handleOpenParentDirectory
+
+      Constants.CREATE_PAGE, this.handleCreatePage,
+      Constants.CREATE_DIRECTORY, this.handleCreateDirectory,
+
+      Constants.OPEN_PARENT_DIRECTORY, this.handleOpenParentDirectory,
+      Constants.SELECT_FILE, this.handleSelectFile,
+      Constants.DESELECT_ALL, this.handleDeselectAll,
+      Constants.REMOVE_SELECTED_FILES, this.handleRemoveSelectedFiles
     );
   },
 
@@ -34,24 +46,34 @@ var BrowserStore = Fluxxor.createStore({
     return {
       path:      this.path,
       contents:  this.contents,
+      selected:  this.selected,
       isRoot:    this.path.length === 0,
     };
   },
 
+  getPath: function () {
+    return this.path.join('/') || '/';
+  },
+
   fetchContents: function () {
     var self = this;
-
-    var path = this.path.join('/');
-    var url = PAGES_URL + path;
-
-    jQuery.get(url).then(function (response) {
-      self.contents = response;
+    return Rango.readDir(this.getPath()).then(function (data) {
+      self.contents = data;
+      self.selected = self.selected.clear();
       self.emit('change');
     });
   },
 
   handleOpenPath: function (path) {
-    this.path = path;
+    this.path = path.split('/');
+
+    // remove empty strings from end of path
+    var i = this.path.length - 1;
+    while (i >= 0 && this.path[i].length <= 0) {
+      this.path.pop();
+      i -= 1;
+    }
+
     this.fetchContents();
   },
 
@@ -63,6 +85,65 @@ var BrowserStore = Fluxxor.createStore({
   handleOpenParentDirectory: function () {
     this.path.pop();
     this.fetchContents();
+  },
+
+  handleCreateDirectory: function () {
+    var self = this;
+
+    var name = window.prompt('Enter a name for the new directory');
+    if (! name) { return; }
+
+    var path = Path.join(this.getPath(), name);
+
+    return Rango.createDir(path).then(function () {
+      self.fetchContents();
+    });
+  },
+
+  handleCreatePage: function () {
+    var self = this;
+
+    var name = window.prompt('Enter a name for the new directory');
+    if (! name) { return; }
+
+    return Rango.createPage(this.getPath(), {
+      metadata: {
+        title: name,
+      },
+      content: ''
+    }).then(function (res) {
+      if (res.success !== true) {
+        throw new Error('Could not create directory');
+      }
+      self.fetchContents();
+    });
+  },
+
+  handleSelectFile: function (fileName) {
+    this.selected = this.selected.clear().add(fileName);
+    this.emit('change');
+  },
+
+  handleDeselectAll: function () {
+    this.selected = this.selected.clear();
+    this.emit('change');
+  },
+
+  handleRemoveSelectedFiles: function () {
+    if (! window.confirm('Are you sure you want to delete the selected files?')) {
+      return;
+    }
+
+    var self = this;
+    var path = this.path.join('/');
+
+    var deferreds = this.selected.map(function (fileName) {
+      return Rango.destroy(Path.join(path, fileName));
+    }).toArray();
+
+    jQuery.when.apply(jQuery, deferreds).done(function () {
+      self.fetchContents();
+    });
   },
 
 });

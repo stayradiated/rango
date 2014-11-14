@@ -13,7 +13,7 @@ var Editor = React.createClass({
 
   render: function () {
     return (
-      <div className='editor'>
+      <div className='route editor'>
         <EditorMetadata page={this.props.editor.page} />
         <EditorContent page={this.props.editor.page} />
       </div>

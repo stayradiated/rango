@@ -1,16 +1,22 @@
-$color_bg: #FFFFFF;
-$color_fg: #383737;
-$color_0:  #20AA99;
-$color_1:  #DB7561;
-$color_2:  #65AACF;
-$color_3:  #F2F5F8;
-$color_4:  #DEE2E7;
-$color_5:  #C6CCD2;
-$color_6:  #B4BBC2;
+$color_bg: #F7F0EC;
+$color_fg: #493C3B;
+
+$color_a:  #A18E88;
+$color_b:  #DE174E;
+$color_c:  #83A9B2;
+
+$color_0:  mix($color_fg, $color_bg, 5);
+$color_1:  mix($color_fg, $color_bg, 10);
+$color_2:  mix($color_fg, $color_bg, 30);
+$color_3:  mix($color_fg, $color_bg, 50);
+
+$header_height: 82px;
 
 // Vendor
 @import 'vendor/normalize';
 @import 'vendor/jeet/index';
+@import 'vendor/codemirror/index';
+@import 'vendor/codemirror/base16-light';
 
 // Modules
 @import 'modules/functions';

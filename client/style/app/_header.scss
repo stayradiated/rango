@@ -1,15 +1,65 @@
 .app-header {
-  background: $color_3;
-  border-radius: 4px;
-  padding: 20px;
-  margin-bottom: 20px;
+  $padding: 20px;
+  $border: 2px;
+  $line_height: $header_height - ($padding * 2) - $border;
+
+  background: $color_0;
+  padding: $padding;
+  border-bottom: 2px solid $color_1;
+  box-sizing: border-box;
+
+  position: fixed;
+  top: 0;
+  width: 100%;
 
   @include cf();
 
-  h1 {
+  nav {
     float: left;
-    line-height: 40px;
+  }
+
+  h1 {
     margin: 0;
+  }
+
+  h1, span {
+    color: $color_b;
+    font-size: 20px;
+    float: left;
+    font-weight: bold;
+    padding: 0 10px;
+    border-radius: 50px;
+    position: relative;
+    margin-right: 20px;
+
+    &:hover {
+      background: $color_1;
+    }
+
+    &:after {
+      display: block;
+      position: absolute;
+      right: -20px;
+      top: 0;
+
+      content: '';
+      font-family: 'entypo';
+      font-size: 25px;
+      color: $color_c;
+      margin: 0 10px;
+    }
+
+    &:last-child {
+      margin-right: 0;
+
+      &:after {
+        content: none;
+      }
+    }
+  }
+
+  h1, span, .button {
+    line-height: $line_height;
   }
 
   .button-group {

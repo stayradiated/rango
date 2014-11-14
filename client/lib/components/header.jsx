@@ -12,11 +12,20 @@ var Header = React.createClass({
   },
 
   render: function () {
-    var title = this.props.browser.path.join(' > ');
-
     return (
       <header className='app-header'>
-        <h1><a href='#' onClick={this.onPathClick}>Rango</a> > {title}</h1>
+        <nav>
+          <h1 onClick={this.onPathClick.bind(this, -1)}>Rango</h1>
+          {
+            this.props.browser.path.map(function (name, i) {
+              return (
+                <span key={i} onClick={this.onPathClick.bind(this, i)}>
+                  {name}
+                </span>
+              );
+            }, this)
+          }
+        </nav>
         <div className='button-group'>
           <button
             className='button'
@@ -35,8 +44,12 @@ var Header = React.createClass({
   onClickPublishBtn: function () {
   },
 
-  onPathClick: function () {
-    this.getFlux().actions.openPath([]);
+  onPathClick: function (index) {
+    var path = '/';
+    if (index >= 0) {
+      path = this.props.browser.path.slice(0, index + 1).join('/');
+    }
+    this.getFlux().actions.openPath(path);
   },
 
 });

@@ -1,10 +1,9 @@
 'use strict';
 
-var jQuery    = require('jquery');
-var Fluxxor   = require('fluxxor');
-var Constants = require('../constants');
+var Fluxxor = require('fluxxor');
 
-var CONFIG_URL = './api/config';
+var Constants = require('../constants');
+var Rango     = require('../api');
 
 var ConfigStore = Fluxxor.createStore({
 
@@ -32,10 +31,8 @@ var ConfigStore = Fluxxor.createStore({
 
   fetchConfig: function () { 
     var self = this;
-
-    jQuery.get(CONFIG_URL).then(function (response) {
-      self.config = response;
-      console.log(response);
+    return Rango.readConfig().then(function (config) {
+      self.config = config;
       self.emit('change');
     });
   },

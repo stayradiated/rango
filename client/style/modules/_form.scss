@@ -3,10 +3,11 @@
 
   label {
     display: block;
-    color: $color_6;
+    color: $color_3;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 21px;
+    text-transform: uppercase;
   }
 }
 
@@ -34,8 +35,7 @@ input[type=password],
 input[type=date],
 input[type=email] {
   display: block;
-  border: 2px solid $color_5;
-  border-radius: 4px;
+  border: 2px solid $color_2;
   height: 38px;
   line-height: 19px;
 
@@ -46,7 +46,7 @@ input[type=email] {
   box-sizing: border-box;
 
   &:focus {
-    border-color: $color_2;
+    border-color: $color_c;
   }
 }
 
@@ -54,14 +54,13 @@ input[type=checkbox] {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
-  border-radius: 4px;
-  background: $color_4;
+  background: $color_2;
   border: 0;
   outline: 0;
   position: relative;
 
   &:checked {
-    background: $color_0;
+    background: $color_c;
 
     &:after {
       content: '✓';
@@ -84,8 +83,7 @@ input[type=checkbox] {
 
     padding: 20px;
     box-sizing: border-box;
-    border: 2px solid $color_5;
-    border-radius: 4px;
+    border: 2px solid $color_2;
     font-family: 'source code pro', monaco, monospace;
     font-weight: 500;
     font-size: 14px;

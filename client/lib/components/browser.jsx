@@ -13,8 +13,8 @@ var Browser = React.createClass({
 
   render: function () {
     return (
-      <div className='browser'>
-        <BrowserSidebar />
+      <div className='route browser'>
+        <BrowserSidebar browser={this.props.browser} />
         <BrowserTable browser={this.props.browser} />
       </div>
     );

@@ -1,9 +1,10 @@
 .button {
-  background: $color_6;
+  $color: $color_a;
+
+  background: $color;
 
   border: 0;
   outline: 0;
-  border-radius: 4px;
 
   color: $color_bg;
   font-weight: bold;
@@ -11,31 +12,34 @@
 
   line-height: 40px;
   padding: 0 40px;
+  border-radius: 40px;
 
   transition: background 0.15s;
 
   &:hover {
-    background: lighten($color_6, 5);
+    background: lighten($color, 5);
   }
 
   &:active {
-    color: darken($color_6, 20);
-    background: $color_6;
+    color: darken($color, 20);
+    background: $color;
     box-shadow: inset 0 1px 3px rgba(#000, 0.3);
     transition-duration: 0;
   }
 }
 
 .button-primary {
-  background: $color_1;
+  $color: $color_b;
+
+  background: $color;
 
   &:hover {
-    background: lighten($color_1, 5);
+    background: lighten($color, 5);
   }
 
   &:active {
-    color: darken($color_1, 20);
-    background: $color_1;
+    color: darken($color, 20);
+    background: $color;
   }
 }
 

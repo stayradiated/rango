@@ -1,20 +1,29 @@
-.browser {
-  @include cf();
+.route.browser {
+
+  > div {
+    position: absolute;
+  }
 
   .browser-sidebar {
-    @include column(1/4);
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 200px;
   }
 
   .browser-table {
-    @include column(3/4);
+    top: 0;
+    left: 200px;
+    right: 0;
+    bottom: 0;
   }
 }
 
 .browser-sidebar {
-  background: $color_3;
-  border-radius: 4px;
+  background: $color_0;
   padding: 20px;
   box-sizing: border-box;
+  border-right: 2px solid $color_1;
 
   ul {
     padding: 0;
@@ -24,7 +33,7 @@
   li {
     list-style-type: none;
     font-weight: bold;
-    color: $color_2;
+    color: $color_c;
     font-size: 14px;
     line-height: 26px;
     cursor: pointer;
@@ -36,12 +45,14 @@
 }
 
 .browser-table {
+  padding: 20px;
+
   table {
     width: 100%;
   }
 
   th {
-    color: $color_6;
+    color: $color_3;
   }
 
   td {
@@ -54,20 +65,27 @@
   }
 
   tr {
-    border-bottom: 2px solid $color_4;
+    border-bottom: 2px solid $color_1;
   }
 
   tbody tr {
-    cursor: pointer;
+    cursor: default;
 
     &:hover {
-      background: $color_3;
+      background: $color_0;
+    }
+  }
+
+  tr.selected {
+    &, &:hover {
+      background: $color_c;
+
+      td {
+        color: $color_bg;
+      }
     }
 
-    &:active {
-      background: $color_3;
-      color: $color_2;
-    }
+    border-bottom-color: $color_bg;
   }
 
   td.name {
@@ -78,7 +96,7 @@
   td.type {
     font-family: 'entypo';
     font-size: 36px;
-    color: $color_2;
+    color: $color_c;
     text-align: center;
     width: 50px;
   }
