@@ -1,6 +1,7 @@
 'use strict';
 
-var Fluxxor = require('fluxxor');
+var Immutable = require('immutable');
+var Fluxxor   = require('fluxxor');
 
 var Constants = require('../constants');
 var Rango     = require('../api');
@@ -8,15 +9,19 @@ var Rango     = require('../api');
 var EditorStore = Fluxxor.createStore({
 
   initialize: function () {
-    // a stack storing the current path stored in an array
-    // /usr/local/bin => ['usr', 'local', 'bin']
-    this.path = '';
 
-    // the directories and pages in the current path
-    this.page = {
-      metadata: {},
-      content: '',
-    };
+    this.state = Immutable.fromJS({
+
+      // path to the currently edited file
+      path: '',
+
+      // the directories and pages in the current path
+      page: {
+        content: '',
+        metadata: {},
+      },
+
+    });
 
     // listen to actions
     this.bindActions(
@@ -24,30 +29,24 @@ var EditorStore = Fluxxor.createStore({
     );
   },
 
-  getState: function () {
-    return {
-      page: this.page,
-    };
-  },
-
   fetchPage: function () {
     var self = this;
 
     // empty content while we are waiting
-    this.page = {
-      metadata: {},
-      content: '',
-    };
+    this.state = this.state.set('page', Immutable.fromJS({
+      metadata:  {},
+      content:   '',
+    }));
     self.emit('change');
 
-    Rango.readPage(this.path).then(function (page) {
-      self.page = page ;
+    Rango.readPage(this.state.get('path')).then(function (page) {
+      self.state = self.state.set('page', Immutable.fromJS(page));
       self.emit('change');
     });
   },
 
   handleOpenPage: function (filename) {
-    this.path = filename;
+    this.state = this.state.set('path', filename);
     this.fetchPage();
   },
 

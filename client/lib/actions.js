@@ -31,8 +31,8 @@ module.exports = {
     this.dispatch(Constants.CREATE_DIRECTORY, name);
   },
 
-  selectFile: function (fileName) {
-    this.dispatch(Constants.SELECT_FILE, fileName);
+  selectFile: function (file) {
+    this.dispatch(Constants.SELECT_FILE, file);
   },
 
   deselectAll: function () {

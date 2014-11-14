@@ -1,11 +1,15 @@
 'use strict';
 
-var React = require('react');
-var Fluxxor   = require('fluxxor');
-var FluxMixin = Fluxxor.FluxMixin(React);
+var React           = require('react');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+var Fluxxor         = require('fluxxor');
+var FluxMixin       = Fluxxor.FluxMixin(React);
 
 var Header = React.createClass({
-  mixins: [FluxMixin],
+  mixins: [
+    FluxMixin,
+    PureRenderMixin,
+  ],
   
   propTypes: {
     browser: React.PropTypes.object.isRequired,
@@ -17,13 +21,13 @@ var Header = React.createClass({
         <nav>
           <h1 onClick={this.onPathClick.bind(this, -1)}>Rango</h1>
           {
-            this.props.browser.path.map(function (name, i) {
+            this.props.browser.get('path').map(function (name, i) {
               return (
                 <span key={i} onClick={this.onPathClick.bind(this, i)}>
                   {name}
                 </span>
               );
-            }, this)
+            }, this).toArray()
           }
         </nav>
         <div className='button-group'>
@@ -47,7 +51,7 @@ var Header = React.createClass({
   onPathClick: function (index) {
     var path = '/';
     if (index >= 0) {
-      path = this.props.browser.path.slice(0, index + 1).join('/');
+      path = this.props.browser.get('path').slice(0, index + 1).join('/');
     }
     this.getFlux().actions.openPath(path);
   },

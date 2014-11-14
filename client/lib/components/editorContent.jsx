@@ -1,13 +1,17 @@
 'use strict';
 
-var React = require('react');
-var CodeMirror = require('react-code-mirror');
-var Marked = require('marked');
+var React           = require('react');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+var CodeMirror      = require('react-code-mirror');
+var Marked          = require('marked');
 
 // load markdown syntax for codemirror
 require('codemirror/mode/markdown/markdown');
 
 var EditorContent = React.createClass({
+  mixins: [
+    PureRenderMixin
+  ],
 
   propTypes: {
     page: React.PropTypes.object.isRequired,
@@ -15,7 +19,7 @@ var EditorContent = React.createClass({
 
   getInitialState: function (props) {
     return {
-      content: (props || this.props).page.content,
+      content: (props || this.props).page.get('content'),
     };
   },
 

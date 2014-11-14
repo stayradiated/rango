@@ -1,8 +1,12 @@
 'use strict';
 
-var React = require('react');
+var React           = require('react');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
 var InputText = React.createClass({
+  mixins: [
+    PureRenderMixin,
+  ],
 
   propTypes: {
     label: React.PropTypes.string.isRequired,

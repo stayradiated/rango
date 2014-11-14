@@ -1,25 +1,29 @@
 'use strict';
 
-var React = require('react');
+var React           = require('react');
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
-var InputText = require('./inputText');
+var InputText     = require('./inputText');
 var InputTextarea = require('./inputTextarea');
 var InputCheckbox = require('./inputCheckbox');
 
 var EditorMetadata = React.createClass({
+  mixins: [
+    PureRenderMixin,
+  ],
 
   propTypes: {
     page: React.PropTypes.object.isRequired,
   },
 
   render: function () {
-    var meta = this.props.page.metadata;
+    var meta = this.props.page.get('metadata');
 
     var data = {
-      title: meta.title || '',
-      description: meta.description || '',
-      date: meta.date || '',
-      type: meta.type || '',
+      title: meta.get('title', ''),
+      description: meta.get('description', ''),
+      date: meta.get('date', ''),
+      type: meta.get('type', ''),
     };
 
     // for (var key in meta) {

@@ -1,15 +1,19 @@
 'use strict';
 
-var React     = require('react');
-var Fluxxor   = require('fluxxor');
-var FluxMixin = Fluxxor.FluxMixin(React);
+var React           = require('react');
+var Fluxxor         = require('fluxxor');
+var FluxMixin       = Fluxxor.FluxMixin(React);
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
 var Constants        = require('../constants');
 var BrowserDirectory = require('./browserDirectory');
 var BrowserFile      = require('./browserFile');
 
 var BrowserTable = React.createClass({
-  mixins: [FluxMixin],
+  mixins: [
+    FluxMixin,
+    PureRenderMixin,
+  ],
 
   propTypes: {
     browser: React.PropTypes.object.isRequired,
@@ -17,30 +21,28 @@ var BrowserTable = React.createClass({
 
   render: function () {
     var rows = [];
-    var contents = this.props.browser.contents;
-    var selected = this.props.browser.selected;
+    var contents = this.props.browser.get('contents');
+    var selected = this.props.browser.get('selected');
 
-    for (var i = 0, len = contents.directories.length; i < len; i++) {
-      var dir = contents.directories[i];
+    contents.get('directories').forEach(function (item) {
       rows.push(
         <BrowserDirectory
-          key={dir.name}
-          item={dir}
-          selected={selected.contains(dir.name)}
+          key={item.get('name')}
+          item={item}
+          selected={selected.contains(item)}
         />
       );
-    }
+    });
 
-    for (var i = 0, len = contents.pages.length; i < len; i++) {
-      var page = contents.pages[i];
+    contents.get('pages').forEach(function (item) {
       rows.push(
         <BrowserFile
-          key={page.name}
-          item={page}
-          selected={selected.contains(page.name)}
+          key={item.get('name')}
+          item={item}
+          selected={selected.contains(item)}
         />
       );
-    }
+    });
 
     return (
       <div onClick={this.onClick} className='browser-table'>

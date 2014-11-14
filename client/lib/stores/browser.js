@@ -11,18 +11,23 @@ var Rango     = require('../api');
 var BrowserStore = Fluxxor.createStore({
 
   initialize: function () {
-    // a stack storing the current path stored in an array
-    // /usr/local/bin => ['usr', 'local', 'bin']
-    this.path = [];
 
-    // the directories and pages in the current path
-    this.contents = {
-      directories: [],
-      pages: [],
-    };
+    this.state = Immutable.fromJS({
 
-    // a set of selected pages and directories
-    this.selected = Immutable.Set();
+      // a stack storing the current path stored in an array
+      // /usr/local/bin => ['usr', 'local', 'bin']
+      path: Immutable.List(),
+
+      // the directories and pages in the current path
+      contents: Immutable.fromJS({
+        directories: [],
+        pages: [],
+      }),
+
+      // a set of selected pages and directories
+      selected: Immutable.Set(),
+
+    });
 
     // fetch contents of root directory
     this.fetchContents();
@@ -42,48 +47,49 @@ var BrowserStore = Fluxxor.createStore({
     );
   },
 
-  getState: function () {
-    return {
-      path:      this.path,
-      contents:  this.contents,
-      selected:  this.selected,
-      isRoot:    this.path.length === 0,
-    };
-  },
-
   getPath: function () {
-    return this.path.join('/') || '/';
+    var path = this.state.get('path');
+
+    if (path.size === 0) {
+      return '/';
+    } else {
+      return path.join('/');
+    }
   },
 
   fetchContents: function () {
     var self = this;
     return Rango.readDir(this.getPath()).then(function (data) {
-      self.contents = data;
-      self.selected = self.selected.clear();
+      self.state = self.state.merge({
+        contents: Immutable.fromJS(data),
+        selected: self.state.get('selected').clear(),
+      });
       self.emit('change');
     });
   },
 
-  handleOpenPath: function (path) {
-    this.path = path.split('/');
-
-    // remove empty strings from end of path
-    var i = this.path.length - 1;
-    while (i >= 0 && this.path[i].length <= 0) {
-      this.path.pop();
-      i -= 1;
-    }
+  handleOpenPath: function (newPath) {
+    this.state = this.state.update('path', function (path) {
+      if (newPath === '/') {
+        return path.clear();
+      }
+      return Immutable.List(newPath.split('/'));
+    });
 
     this.fetchContents();
   },
 
   handleOpenDirectory: function (dirName) {
-    this.path.push(dirName);
+    this.state = this.state.update('path', function (path) {
+      return path.push(dirName);
+    });
     this.fetchContents();
   },
 
   handleOpenParentDirectory: function () {
-    this.path.pop();
+    this.state = this.state.update('path', function (path) {
+      return path.pop();
+    });
     this.fetchContents();
   },
 
@@ -103,7 +109,7 @@ var BrowserStore = Fluxxor.createStore({
   handleCreatePage: function () {
     var self = this;
 
-    var name = window.prompt('Enter a name for the new directory');
+    var name = window.prompt('Enter a title for the new page');
     if (! name) { return; }
 
     return Rango.createPage(this.getPath(), {
@@ -119,13 +125,17 @@ var BrowserStore = Fluxxor.createStore({
     });
   },
 
-  handleSelectFile: function (fileName) {
-    this.selected = this.selected.clear().add(fileName);
+  handleSelectFile: function (file) {
+    this.state = this.state.update('selected', function (selected) {
+      return selected.clear().add(file);
+    });
     this.emit('change');
   },
 
   handleDeselectAll: function () {
-    this.selected = this.selected.clear();
+    this.state = this.state.update('selected', function (selected) {
+      return selected.clear();
+    });
     this.emit('change');
   },
 
@@ -135,10 +145,10 @@ var BrowserStore = Fluxxor.createStore({
     }
 
     var self = this;
-    var path = this.path.join('/');
+    var path = this.getPath();
 
-    var deferreds = this.selected.map(function (fileName) {
-      return Rango.destroy(Path.join(path, fileName));
+    var deferreds = this.state.get('selected').map(function (file) {
+      return Rango.destroy(file.get('path'));
     }).toArray();
 
     jQuery.when.apply(jQuery, deferreds).done(function () {

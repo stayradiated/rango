@@ -1,18 +1,22 @@
 'use strict';
 
-var React = require('react');
-var Fluxxor   = require('fluxxor');
-var FluxMixin = Fluxxor.FluxMixin(React);
+var React           = require('react');
+var Fluxxor         = require('fluxxor');
+var FluxMixin       = Fluxxor.FluxMixin(React);
+var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
 var BrowserSidebar = React.createClass({
-  mixins: [FluxMixin],
+  mixins: [
+    FluxMixin,
+    PureRenderMixin,
+  ],
 
   propTypes: {
     browser: React.PropTypes.object.isRequired,
   },
 
   render: function () {
-    var selected = this.props.browser.selected.size;
+    var selected = this.props.browser.get('selected').size;
 
     return (
       <div className='browser-sidebar'>
