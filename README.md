@@ -6,6 +6,19 @@ A web frontend for [hugo](https://gohugo.io).
 It's designed to make it easy to manage a small site, even for people with
 little computer experience.
 
+## Installation
+
+```
+$ go get -u -v github.com/stayradiated/rango
+$ cd $GOPATH/src/github.com/stayradiated/rango
+$ cd client
+$ npm install
+$ gulp
+$ cd ..
+$ go build
+$ ./rango
+```
+
 ## Using with Apache
 
 Based on [this
