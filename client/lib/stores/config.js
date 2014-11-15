@@ -8,6 +8,9 @@ var Rango     = require('../api');
 
 var ConfigStore = Fluxxor.createStore({
 
+  actions: {
+  },
+
   initialize: function () {
     this.config = Immutable.fromJS({
       types: {
@@ -18,10 +21,6 @@ var ConfigStore = Fluxxor.createStore({
 
     // fetch config from server
     this.fetchConfig();
-
-    this.bindActions({
-
-    });
   },
 
   getState: function () {

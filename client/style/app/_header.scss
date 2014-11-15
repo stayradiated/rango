@@ -3,9 +3,9 @@
   $border: 2px;
   $line_height: $header_height - ($padding * 2) - $border;
 
-  background: $color_0;
+  background: $color_fg;
   padding: $padding;
-  border-bottom: 2px solid $color_1;
+  border-bottom: 2px solid $color_b1;
   box-sizing: border-box;
 
   position: fixed;
@@ -25,12 +25,11 @@
   h1, span {
     $sep_width: 20px;
 
-    color: $color_a;
+    color: $color_bg;
     font-size: 20px;
     float: left;
     font-weight: bold;
     position: relative;
-    border-radius: 5px;
 
     padding: 0 10px;
     margin-right: $sep_width;
@@ -38,12 +37,13 @@
     transition: background 0.15s;
 
     &:hover {
-      background: $color_1;
+      background: $color_f0;
     }
 
     &:active {
       box-shadow: inset 0 1px 3px rgba(#000, 0.1);
       transition-duration: 0;
+      background: $color_f0;
     }
 
     &:after {
@@ -58,7 +58,7 @@
 
       font-family: 'entypo';
       font-size: 25px;
-      color: $color_c;
+      color: $color_b;
     }
 
     &:last-child {

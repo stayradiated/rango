@@ -22,7 +22,6 @@
     "fluxxor": "^1.5.0",
     "immutable": "^3.1.0",
     "jquery": "^2.1.1",
-    "lodash": "^2.4.1",
     "marked": "^0.3.2",
     "moment": "^2.8.3",
     "react": "^0.12.0",

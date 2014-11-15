@@ -23,14 +23,15 @@ var BrowserSidebar = React.createClass({
         <ul>
           <li onClick={this.createFolder}>Create Folder</li>
           <li onClick={this.createPage}>Create Page</li>
+          <hr />
           {
             selected === 1 ? (
               <li>Rename Selected Folder</li>
             ) : null
           }
           {
-            selected === 1 ? (
-              <li onClick={this.removeSelected}>Delete Selected Files</li>
+            selected >= 1 ? (
+              <li onClick={this.removeSelected}>Delete Selected Items</li>
             ) : null
           }
         </ul>
@@ -39,20 +40,20 @@ var BrowserSidebar = React.createClass({
   },
 
   createFolder: function () {
-    this.getFlux().actions.createDirectory();
+    this.getFlux().actions.create.directory();
   },
 
   createPage: function () {
-    this.getFlux().actions.createPage();
+    this.getFlux().actions.create.page();
   },
 
   removeSelected: function () {
-    this.getFlux().actions.removeSelectedFiles();
+    this.getFlux().actions.remove.selected();
   },
 
   /*
   openParent: function () {
-    this.getFlux().actions.openParentDirectory();
+    this.getFlux().actions.open.parent();
   },
   */
 

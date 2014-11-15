@@ -41,11 +41,11 @@ var BrowserRow = React.createClass({
 
   onClick: function (e) {
     e.stopPropagation();
-    this.getFlux().actions.selectFile(this.props.item);
+    this.getFlux().actions.select.file(this.props.item);
   },
 
   onDoubleClick: function () {
-    this.getFlux().actions.openPath(this.props.item.get('path'));
+    this.getFlux().actions.open.path(this.props.item.get('path'));
   },
 
 });

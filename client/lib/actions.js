@@ -3,44 +3,33 @@
 var Constants = require('./constants');
 
 module.exports = {
-
-  openDirectory: function (directoryName) {
-    this.dispatch(Constants.OPEN_DIRECTORY, directoryName);
+  open: {
+    directory: dispatch('OPEN_DIRECTORY'),
+    parent: dispatch('OPEN_PARENT_DIRECTORY'),
+    page: dispatch('OPEN_PAGE'),
+    path: dispatch('OPEN_PATH'),
   },
-
-  openParentDirectory: function () {
-    this.dispatch(Constants.OPEN_PARENT_DIRECTORY);
+  create: {
+    page: dispatch('CREATE_PAGE'),
+    directory: dispatch('CREATE_DIRECTORY'),
   },
-
-  openPage: function (fileName) {
-    this.dispatch(Constants.OPEN_PAGE, fileName);
+  select: {
+    file: dispatch('SELECT_FILE'),
+    none: dispatch('DESELECT_ALL'),
   },
-
-  openPath: function (path) {
-    if (typeof path !== 'string') {
-      throw new Error('openPath: path must be a string');
-    }
-    this.dispatch(Constants.OPEN_PATH, path);
+  remove: {
+    selected: dispatch('REMOVE_SELECTED_FILES'),
   },
-
-  createPage: function (name) {
-    this.dispatch(Constants.CREATE_PAGE, name);
+  save: {
+    page: dispatch('SAVE_PAGE'),
   },
-
-  createDirectory: function (name) {
-    this.dispatch(Constants.CREATE_DIRECTORY, name);
+  publish: {
+    site: dispatch('PUBLISH_SITE'),
   },
-
-  selectFile: function (file) {
-    this.dispatch(Constants.SELECT_FILE, file);
-  },
-
-  deselectAll: function () {
-    this.dispatch(Constants.DESELECT_ALL);
-  },
-
-  removeSelectedFiles: function () {
-    this.dispatch(Constants.REMOVE_SELECTED_FILES);
-  },
-
 };
+
+function dispatch (constant) {
+  return function (args) {
+    this.dispatch(Constants[constant], args);
+  };
+}

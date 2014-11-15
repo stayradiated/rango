@@ -3,7 +3,7 @@
 
   label {
     display: block;
-    color: $color_3;
+    color: $color_b3;
     font-weight: 600;
     font-size: 12px;
     line-height: 21px;
@@ -35,7 +35,7 @@ input[type=password],
 input[type=date],
 input[type=email] {
   display: block;
-  border: 2px solid $color_2;
+  border: 2px solid $color_b2;
   height: 38px;
   line-height: 19px;
 
@@ -54,7 +54,7 @@ input[type=checkbox] {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
-  background: $color_2;
+  background: $color_b2;
   border: 0;
   outline: 0;
   position: relative;
@@ -83,14 +83,14 @@ input[type=checkbox] {
 
     padding: 20px;
     box-sizing: border-box;
-    border: 2px solid $color_2;
+    border: 2px solid $color_b2;
     font-family: 'source code pro', monaco, monospace;
     font-weight: 500;
     font-size: 14px;
     outline: 0;
 
     &:focus {
-      border-color: $color_2;
+      border-color: $color_b2;
     }
   }
 }

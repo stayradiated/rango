@@ -65,7 +65,7 @@ var BrowserTable = React.createClass({
   },
 
   onClick: function () {
-    this.getFlux().actions.deselectAll();
+    this.getFlux().actions.select.none();
   },
 
 });

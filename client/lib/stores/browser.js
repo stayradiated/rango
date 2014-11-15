@@ -10,6 +10,19 @@ var Rango     = require('../api');
 
 var BrowserStore = Fluxxor.createStore({
 
+  actions: {
+    OPEN_PATH:              'handleOpenPath',
+    OPEN_DIRECTORY:         'handleOpenDirectory',
+
+    CREATE_PAGE:            'handleCreatePage',
+    CREATE_DIRECTORY:       'handleCreateDirectory',
+
+    OPEN_PARENT_DIRECTORY:  'handleOpenParentDirectory',
+    SELECT_FILE:            'handleSelectFile',
+    DESELECT_ALL:           'handleDeselectAll',
+    REMOVE_SELECTED_FILES:  'handleRemoveSelectedFiles',
+  },
+
   initialize: function () {
 
     this.state = Immutable.fromJS({
@@ -31,19 +44,6 @@ var BrowserStore = Fluxxor.createStore({
 
     // fetch contents of root directory
     this.fetchContents();
-
-    this.bindActions({
-      OPEN_PATH:              'handleOpenPath',
-      OPEN_DIRECTORY:         'handleOpenDirectory',
-
-      CREATE_PAGE:            'handleCreatePage',
-      CREATE_DIRECTORY:       'handleCreateDirectory',
-
-      OPEN_PARENT_DIRECTORY:  'handleOpenParentDirectory',
-      SELECT_FILE:            'handleSelectFile',
-      DESELECT_ALL:           'handleDeselectAll',
-      REMOVE_SELECTED_FILES:  'handleRemoveSelectedFiles',
-    });
   },
 
   // get the current path as a string, also handles root directory properly

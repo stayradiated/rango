@@ -8,6 +8,10 @@ var Rango     = require('../api');
 
 var EditorStore = Fluxxor.createStore({
 
+  actions: {
+    OPEN_PAGE: 'handleOpenPage',
+  },
+
   initialize: function () {
 
     this.state = Immutable.fromJS({
@@ -21,10 +25,6 @@ var EditorStore = Fluxxor.createStore({
         metadata: {},
       },
 
-    });
-
-    this.bindActions({
-      OPEN_PAGE: 'handleOpenPage',
     });
   },
 

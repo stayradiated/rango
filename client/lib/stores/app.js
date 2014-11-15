@@ -8,15 +8,15 @@ var Constants = require('../constants');
 
 var AppStore = Fluxxor.createStore({
 
+  actions: {
+    OPEN_PATH:       'handleOpenBrowser',
+    OPEN_DIRECTORY:  'handleOpenBrowser',
+    OPEN_PAGE:       'handleOpenEditor',
+  },
+
   initialize: function () {
     this.state = Immutable.fromJS({
       route: Constants.ROUTE_BROWSER,
-    });
-
-    this.bindActions({
-      OPEN_PATH:       'handleOpenBrowser',
-      OPEN_DIRECTORY:  'handleOpenBrowser',
-      OPEN_PAGE:       'handleOpenEditor',
     });
   },
 

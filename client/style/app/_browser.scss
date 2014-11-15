@@ -20,10 +20,10 @@
 }
 
 .browser-sidebar {
-  background: $color_0;
+  background: $color_b0;
   padding: 20px;
   box-sizing: border-box;
-  border-right: 2px solid $color_1;
+  border-right: 2px solid $color_b1;
 
   ul {
     padding: 0;
@@ -52,10 +52,11 @@
   }
 
   th {
-    color: $color_3;
+    color: $color_b3;
   }
 
   td {
+    color: $color_f3;
   }
 
   td, th {
@@ -65,14 +66,14 @@
   }
 
   tr {
-    border-bottom: 2px solid $color_1;
+    border-bottom: 2px solid $color_b1;
   }
 
   tbody tr {
     cursor: default;
 
     &:hover {
-      background: $color_0;
+      background: $color_b0;
     }
   }
 
@@ -89,6 +90,7 @@
   }
 
   td.name {
+    color: $color_fg;
     font-weight: bold;
     font-size: 16px;
   }

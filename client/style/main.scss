@@ -1,14 +1,19 @@
-$color_bg: #F7F0EC;
-$color_fg: #493C3B;
+$color_bg: #FFFFFF;
+$color_fg: #2B2B28;
 
-$color_a:  #A18E88;
-$color_b:  #DE174E;
-$color_c:  #83A9B2;
+$color_a:  #AA8C81;
+$color_b:  #9E2D4A;
+$color_c:  #25ABB0;
 
-$color_0:  mix($color_fg, $color_bg, 5);
-$color_1:  mix($color_fg, $color_bg, 10);
-$color_2:  mix($color_fg, $color_bg, 30);
-$color_3:  mix($color_fg, $color_bg, 50);
+$color_b0:  mix($color_fg, $color_bg, 5);
+$color_b1:  mix($color_fg, $color_bg, 10);
+$color_b2:  mix($color_fg, $color_bg, 20);
+$color_b3:  mix($color_fg, $color_bg, 40);
+
+$color_f0:  mix($color_bg, $color_fg, 5);
+$color_f1:  mix($color_bg, $color_fg, 10);
+$color_f2:  mix($color_bg, $color_fg, 20);
+$color_f3:  mix($color_bg, $color_fg, 40);
 
 $header_height: 82px;
 

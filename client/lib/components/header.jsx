@@ -33,19 +33,21 @@ var Header = React.createClass({
         <div className='button-group'>
           <button
             className='button'
-            onClick={this.onClickSettingsBtn}>Settings</button>
+            onClick={this.onClickSaveBtn}>Save Page</button>
           <button
             className='button button-primary'
-            Click={this.onClickPublishBtn}>Publish</button>
+            Click={this.onClickPublishBtn}>Publish Site</button>
         </div>
       </header>
     );
   },
 
-  onClickSettingsBtn: function () {
+  onClickSaveBtn: function () {
+    this.getFlux().actions.save.page();
   },
 
   onClickPublishBtn: function () {
+    this.getFlux().actions.publish.site();
   },
 
   onPathClick: function (index) {
@@ -53,7 +55,7 @@ var Header = React.createClass({
     if (index >= 0) {
       path = this.props.browser.get('path').slice(0, index + 1).join('/');
     }
-    this.getFlux().actions.openPath(path);
+    this.getFlux().actions.open.path(path);
   },
 
 });
