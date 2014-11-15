@@ -32,7 +32,7 @@
 
   li {
     list-style-type: none;
-    font-weight: bold;
+    font-weight: $bold;
     color: $color_c;
     font-size: 14px;
     line-height: 26px;
@@ -91,8 +91,8 @@
 
   td.name {
     color: $color_fg;
-    font-weight: bold;
-    font-size: 16px;
+    font-weight: $semibold;
+    font-size: 15px;
   }
 
   td.type {

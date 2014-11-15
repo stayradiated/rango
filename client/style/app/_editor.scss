@@ -65,7 +65,7 @@ $sidebar_width: 300px;
     margin: 0;
     text-transform: none;
     font-size: 20px;  
-    font-weight: bold;
+    font-weight: $bold;
   }
 
 }
@@ -89,5 +89,5 @@ $sidebar_width: 300px;
 }
 
 .cm-header, .cm-strong {
-  font-weight: 700;
+  font-weight: bold;
 }

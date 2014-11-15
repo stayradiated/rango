@@ -17,6 +17,10 @@ $color_f3:  mix($color_bg, $color_fg, 40);
 
 $header_height: 82px;
 
+$regular: 400;
+$semibold: 500;
+$bold: 700;
+
 // Vendor
 @import 'vendor/normalize';
 @import 'vendor/jeet/index';
