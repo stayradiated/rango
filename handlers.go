@@ -32,8 +32,7 @@ func handleCreateDir(w http.ResponseWriter, req *http.Request) {
 	os.MkdirAll(fp, 0755)
 
 	returnSuccess(w, map[string]interface{}{
-		"success": true,
-		"path":    fp,
+		"path": fp,
 	})
 }
 
@@ -67,8 +66,7 @@ func handleCreatePage(w http.ResponseWriter, req *http.Request) {
 	rangolib.Save(fp, metadata, content)
 
 	returnSuccess(w, map[string]interface{}{
-		"success": true,
-		"path":    fp,
+		"path": fp,
 	})
 }
 
@@ -103,6 +101,9 @@ func handleReadDir(w http.ResponseWriter, req *http.Request) {
 	}
 
 	returnSuccess(w, pathList)
+	returnSuccess(w, map[string]interface{}{
+		"path": fp,
+	})
 }
 
 // handleReadFile
@@ -219,8 +220,7 @@ func handleDestroy(w http.ResponseWriter, req *http.Request) {
 	}
 
 	returnSuccess(w, map[string]interface{}{
-		"path":    fp,
-		"success": true,
+		"path": fp,
 	})
 }
 
