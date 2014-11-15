@@ -7,24 +7,26 @@
 
 ### Creating a Directory
 
-**URL:**
+**URL**
 
-```
+``` http
 POST /api/dir/{path:.*}
 ```
 
 Where `path` is the path to a directory that the new directory will be created
 in.
 
-**Properties:**
+**Properties**
 
-- `dir (object)` - a directory to create
-    - `name (string0` - the name of the directory
+- `dir (object)`
+    - `name (string)` - the name of the directory
 
-**Example:**
+**Example Request**
 
-```
+``` http
 POST /api/dir/
+Content-Type: application/json
+Accept: application/json
 
 {
     "dir": {
@@ -33,9 +35,9 @@ POST /api/dir/
 }
 ```
 
-**Response**
+**Example Response**
 
-```
+``` http
 HTTP/1.1 201 Created
 Location: http://localhost:8080/api/dir/foo
 Content-Type: application/json
@@ -48,25 +50,41 @@ Content-Type: application/json
 }
 ```
 
-### Renaming a Directory
-
-**URL:**
+**Errors**
 
 ```
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+    "errors": {
+        // a directory with that name already exists
+    }
+}
+```
+
+
+### Renaming a Directory
+
+**URL**
+
+``` http
 PUT /api/rename/{path:.*}
 ```
 
 Where `path` is the path to a directory that you want to you rename.
 
-**Properties:**
+**Properties**
 
-- `dir (object)` - a directory to create
-    - `name (string0` - the new name of the directory
+- `dir (object)`
+    - `name (string)` - the new name of the directory
 
-**Example:**
+**Example Request**
 
-```
-POST /api/dir/foo
+``` http
+PUT /api/dir/foo
+Content-Type: application/json
+Accept: application/json
 
 {
     "dir": {
@@ -75,21 +93,32 @@ POST /api/dir/foo
 }
 ```
 
-**Response**
+**Example Response**
 
-```
+``` http
 HTTP/1.1 204 No Content
-Location: http://localhost:8080/api/dir/bar
-Content-Type: application/json
 ```
 
-```
+**Errors**
+
+``` http
 HTTP/1.1 404 Not Found
-Location: http://localhost:8080/api/dir/abc
 Content-Type: application/json
 
 {
     "errors": {
+        // couldn't find directory specified by path
+    }
+}
+```
+
+``` http
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+    "errors": {
+        // a directory with that name already exists
     }
 }
 ```
@@ -100,6 +129,37 @@ Content-Type: application/json
 
 ### Copy a Page or Directory
 
-### Move a Page or Directory
-
 ### Delete a Page or Directory
+
+**URL**
+
+``` http
+DELETE /api/{path:.*}
+```
+
+Where `path` is the path to a directory or page that you want to you delete.
+
+**Example Request**
+
+``` http
+DELETE /api/dir/foo/bar.md
+```
+
+**Example Response**
+
+``` http
+HTTP/1.1 204 No Content
+```
+
+**Errors**
+
+``` http
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+
+{
+    "errors": {
+        // couldn't find directory specified by path
+    }
+}
+```
