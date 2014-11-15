@@ -30,6 +30,11 @@ var EditorContent = React.createClass({
   render: function () {
     var markdown = Marked(this.state.content);
 
+    // <div
+    //   className='editor-preview'
+    //   dangerouslySetInnerHTML={{__html: markdown}}
+    // />
+
     return (
       <div className='editor-content'>
         <CodeMirror
@@ -40,10 +45,6 @@ var EditorContent = React.createClass({
           lineNumbers={false}
           lineWrapping={true}
           onChange={this.onChange}
-        />
-        <div
-          className='editor-preview'
-          dangerouslySetInnerHTML={{__html: markdown}}
         />
       </div>
     );

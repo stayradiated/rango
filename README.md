@@ -6,7 +6,9 @@ A web frontend for [hugo](https://gohugo.io).
 It's designed to make it easy to manage a small site, even for people with
 little computer experience.
 
-![Screenshot](./screenshot.jpg)
+![File Browser](./screenshot_1.jpg)
+
+![Text Editor](./screenshot_2.jpg)
 
 ## Installation
 

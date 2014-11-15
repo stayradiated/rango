@@ -8,6 +8,8 @@ $sidebar_width: 300px;
   bottom: 0;
   width: $sidebar_width;
 
+  overflow-y: auto;
+
   background: $color_b0;
   padding: 20px;
   border-right: 2px solid $color_b1;
@@ -29,7 +31,7 @@ $sidebar_width: 300px;
   position: absolute;
   top: 0;
   left: 0;
-  width: 50%;
+  right: 0;
   bottom: 0;
 }
 
@@ -79,8 +81,9 @@ $sidebar_width: 300px;
   padding: 20px;
   height: auto;
 
-  font-family: 'latinmodernmono', monospace;
-  font-size: 16px;
+  color: $color_f0;
+  font-family: Menlo, monospace;
+  font-size: 14px;
   line-height: 24px;
   background: $color_bg;
 }
