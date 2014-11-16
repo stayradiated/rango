@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -14,101 +14,104 @@ import (
 	"github.com/stayradiated/rango/rangolib"
 )
 
-/*
- *     __   __   ___      ___  ___
- *    /  ` |__) |__   /\   |  |__
- *    \__, |  \ |___ /~~\  |  |___
- *
- */
-
-// handleCreateDir creates a directory
-func handleCreateDir(w http.ResponseWriter, req *http.Request) {
-	fp, err := sanitizePath(mux.Vars(req)["path"])
-	if err != nil {
-		fmt.Fprint(w, err)
-		return
-	}
-
-	os.MkdirAll(fp, 0755)
-
-	returnSuccess(w, map[string]interface{}{
-		"path": fp,
-	})
-}
-
-func handleCreateFile(w http.ResponseWriter, req *http.Request) {
-}
-
-func handleCreatePage(w http.ResponseWriter, req *http.Request) {
-	fp, err := sanitizePath(mux.Vars(req)["path"])
-	if err != nil {
-		fmt.Fprint(w, err)
-		return
-	}
-
-	metadata := map[string]interface{}{}
-	err = json.Unmarshal([]byte(req.FormValue("metadata")), &metadata)
-	if err != nil {
-		fmt.Fprint(w, err)
-		return
-	}
-
-	rawTitle, ok := metadata["title"]
-	if !ok {
-		fmt.Fprint(w, errors.New("Must specify title in metadata"))
-		return
-	}
-	title := sanitize.Path(rawTitle.(string) + ".md")
-	fp = path.Join(fp, title)
-
-	content := []byte(req.FormValue("content"))
-
-	rangolib.Save(fp, metadata, content)
-
-	returnSuccess(w, map[string]interface{}{
-		"path": fp,
-	})
-}
-
-// handleCopy copies a page to a new file
-func handleCopy(w http.ResponseWriter, req *http.Request) {
-	location := req.Header.Get("Content-Location")
-	vars := mux.Vars(req)
-	if len(location) > 0 {
-		fmt.Fprint(w, "Moving file from "+location+" to "+vars["path"])
-	}
-}
-
-/*
- *     __   ___       __
- *    |__) |__   /\  |  \
- *    |  \ |___ /~~\ |__/
- *
- */
+//   __     __   ___  __  ___  __   __     ___  __
+//  |  \ | |__) |__  /  `  |  /  \ |__) | |__  /__`
+//  |__/ | |  \ |___ \__,  |  \__/ |  \ | |___ .__/
+//
 
 // handleReadDir reads contents of a directory
 func handleReadDir(w http.ResponseWriter, req *http.Request) {
 	fp, err := sanitizePath(mux.Vars(req)["path"])
 	if err != nil {
-		fmt.Fprint(w, err)
+		errInvalidDir.Write(w)
 		return
 	}
 
-	pathList, err := rangolib.Files(fp)
+	// check that directory exists
+	if dirExists(fp) {
+		errDirNotFound.Write(w)
+		return
+	}
+
+	// try and read contents of dir
+	contents, err := rangolib.DirContents(fp)
+	if err != nil {
+		errDirNotFound.Write(w)
+		return
+	}
+
+	printJson(w, struct {
+		Data []*rangolib.File `json:"data"`
+	}{
+		Data: contents,
+	})
+}
+
+// handleCreateDir creates a directory
+func handleCreateDir(w http.ResponseWriter, req *http.Request) {
+	parent, err := sanitizePath(mux.Vars(req)["path"])
+	if err != nil {
+		errInvalidDir.Write(w)
+		return
+	}
+
+	dirname := req.FormValue("dir[name]")
+	fp := filepath.Join(parent, dirname)
+
+	if dirExists(fp) {
+		errDirConflict.Write(w)
+		return
+	}
+
+	if err = os.MkdirAll(fp, 0755); err != nil {
+		NewApiError(err).Write(w)
+		return
+	}
+
+	info, err := os.Stat(fp)
+	if err != nil {
+		NewApiError(err).Write(w)
+		return
+	}
+
+	dir := &rangolib.File{
+		Path: strings.TrimPrefix(fp, CONTENT_DIR),
+	}
+	dir.Load(info)
+
+	printJson(w, struct {
+		Dir *rangolib.File `json:"dir"`
+	}{
+		Dir: dir,
+	})
+}
+
+// handleUpdateDir renames a directory
+func handleUpdateDir(w http.ResponseWriter, req *http.Request) {
+}
+
+// handleDeleteDir deletes a directory
+func handleDeleteDir(w http.ResponseWriter, req *http.Request) {
+	fp, err := sanitizePath(mux.Vars(req)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
 	}
 
-	returnSuccess(w, pathList)
-	returnSuccess(w, map[string]interface{}{
+	if err = os.RemoveAll(fp); err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+
+	printJson(w, map[string]interface{}{
 		"path": fp,
 	})
 }
 
-// handleReadFile
-func handleReadFile(w http.ResponseWriter, req *http.Request) {
-}
+//   __        __   ___  __
+//  |__)  /\  / _` |__  /__`
+//  |    /~~\ \__> |___ .__/
+//
 
 // handleReadPage reads page data
 func handleReadPage(w http.ResponseWriter, req *http.Request) {
@@ -130,30 +133,39 @@ func handleReadPage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	returnSuccess(w, page)
+	printJson(w, page)
 }
 
-// handleReadConfig reads data from a config
-func handleReadConfig(w http.ResponseWriter, req *http.Request) {
-	config, err := rangolib.ReadConfig()
+// handleCreatePage creates a new page
+func handleCreatePage(w http.ResponseWriter, req *http.Request) {
+	fp, err := sanitizePath(mux.Vars(req)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
 	}
-	returnSuccess(w, config)
-}
 
-/*
- *          __   __       ___  ___
- *    |  | |__) |  \  /\   |  |__
- *    \__/ |    |__/ /~~\  |  |___
- *
- */
+	metadata := map[string]interface{}{}
+	err = json.Unmarshal([]byte(req.FormValue("metadata")), &metadata)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
 
-func handleRename(w http.ResponseWriter, req *http.Request) {
-}
+	rawTitle, ok := metadata["title"]
+	if !ok {
+		fmt.Fprint(w, errors.New("Must specify title in metadata"))
+		return
+	}
+	title := sanitize.Path(rawTitle.(string) + ".md")
+	fp = filepath.Join(fp, title)
 
-func handleUpdateFile(w http.ResponseWriter, req *http.Request) {
+	content := []byte(req.FormValue("content"))
+
+	rangolib.Save(fp, metadata, content)
+
+	printJson(w, map[string]interface{}{
+		"path": fp,
+	})
 }
 
 // handleUpdatePage writes page data to a file
@@ -177,11 +189,44 @@ func handleUpdatePage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	title := sanitize.Path(rawTitle.(string) + ".md")
-	fp = path.Join(fp, title)
+	fp = filepath.Join(fp, title)
 
 	content := []byte(req.FormValue("content"))
 
 	rangolib.Save(fp, metadata, content)
+}
+
+// handleDeletePage deletes a page
+func handleDeletePage(w http.ResponseWriter, req *http.Request) {
+	fp, err := sanitizePath(mux.Vars(req)["path"])
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+
+	if err = os.Remove(fp); err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+
+	printJson(w, map[string]interface{}{
+		"path": fp,
+	})
+}
+
+//   __   __        ___    __
+//  /  ` /  \ |\ | |__  | / _`
+//  \__, \__/ | \| |    | \__>
+//
+
+// handleReadConfig reads data from a config
+func handleReadConfig(w http.ResponseWriter, req *http.Request) {
+	config, err := rangolib.ReadConfig()
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+	printJson(w, config)
 }
 
 // handleUpdateConfig writes json data to a config file
@@ -199,49 +244,16 @@ func handleUpdateConfig(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-/*
- *     __   ___  __  ___  __   __
- *    |  \ |__  /__`  |  |__) /  \ \ /
- *    |__/ |___ .__/  |  |  \ \__/  |
- *
- */
+//   ___         ___  __
+//  |__  | |    |__  /__`
+//  |    | |___ |___ .__/
+//
 
-// handleDestroy deletes a file, page or directory
-func handleDestroy(w http.ResponseWriter, req *http.Request) {
-	fp, err := sanitizePath(mux.Vars(req)["path"])
-	if err != nil {
-		fmt.Fprint(w, err)
-		return
+// handleCopy copies a page to a new file
+func handleCopy(w http.ResponseWriter, req *http.Request) {
+	location := req.Header.Get("Content-Location")
+	vars := mux.Vars(req)
+	if len(location) > 0 {
+		fmt.Fprint(w, "Moving file from "+location+" to "+vars["path"])
 	}
-
-	if err = os.RemoveAll(fp); err != nil {
-		fmt.Fprint(w, err)
-		return
-	}
-
-	returnSuccess(w, map[string]interface{}{
-		"path": fp,
-	})
-}
-
-/*
- *         ___         __
- *    |  |  |  | |    /__`
- *    \__/  |  | |___ .__/
- *
- */
-
-func sanitizePath(p string) (string, error) {
-	fp := path.Join("content", p)
-
-	if !strings.HasPrefix(fp, "content") || strings.Contains(fp, "..") {
-		return fp, errors.New("Invalid Path")
-	}
-
-	return fp, nil
-}
-
-func returnSuccess(w http.ResponseWriter, obj interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(obj)
 }

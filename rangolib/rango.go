@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 	"strings"
-	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/spf13/cast"
@@ -22,60 +21,43 @@ type Page struct {
 	Content  string                 `json:"content"`
 }
 
-type DirItem struct {
-	Name string `json:"name"`
-	Path string `json:"path"`
+type File struct {
+	Name    string `json:"name"`
+	Path    string `json:"path"`
+	IsDir   bool   `json:"isDir"`
+	Size    int64  `json:"size"`
+	ModTime int64  `json:"mtime"`
 }
 
-type PageItem struct {
-	Name    string    `json:"name"`
-	ModTime time.Time `json:"modified_at"`
-	Path    string    `json:"path"`
+func (f *File) Load(info os.FileInfo) {
+	f.Name = info.Name()
+	f.IsDir = info.IsDir()
+	f.Size = info.Size()
+	f.ModTime = info.ModTime().Unix()
 }
 
-type PathList struct {
-	Directories []*DirItem  `json:"directories"`
-	Pages       []*PageItem `json:"pages"`
+func NewFile(dirname string, info os.FileInfo) *File {
+	path := path.Join(dirname, info.Name())
+	path = strings.TrimPrefix(path, "content")
+
+	file := &File{Path: path}
+	file.Load(info)
+	return file
 }
 
-func NewPathList() *PathList {
-	pathList := new(PathList)
-	pathList.Directories = make([]*DirItem, 0)
-	pathList.Pages = make([]*PageItem, 0)
-	return pathList
-}
-
-func (p *PathList) AddFile(fp string, fi os.FileInfo) {
-	name := fi.Name()
-
-	if fi.IsDir() {
-		p.Directories = append(p.Directories, &DirItem{
-			Name: name,
-			Path: fp,
-		})
-	} else {
-		p.Pages = append(p.Pages, &PageItem{
-			Name:    name,
-			ModTime: fi.ModTime(),
-			Path:    fp,
-		})
-	}
-}
-
-func Files(folder string) (*PathList, error) {
-	pathList := NewPathList()
-	files, err := ioutil.ReadDir(folder)
-
+func DirContents(dirname string) ([]*File, error) {
+	files := make([]*File, 0)
+	contents, err := ioutil.ReadDir(dirname)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, f := range files {
-		fp := strings.TrimPrefix(path.Join(folder, f.Name()), "content/")
-		pathList.AddFile(fp, f)
+	for _, info := range contents {
+		file := NewFile(dirname, info)
+		files = append(files, file)
 	}
 
-	return pathList, nil
+	return files, nil
 }
 
 func Read(file io.Reader) (page *Page, err error) {
