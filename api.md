@@ -64,7 +64,10 @@ HTTP/1.1 404 Not Found
 
 {
     "errors": {
-        // could not find specified directory
+        "status": "404",
+        "code": "dir_not_found",
+        "title": "directory does not exist",
+        "detail": "Could not find the directory '/foo/bar'"
     }
 }
 ```
@@ -122,7 +125,10 @@ HTTP/1.1 400 Bad Request
 
 {
     "errors": {
-        // malformed JSON syntax
+        "status": "400",
+        "code": "malformed_json",
+        "title": "could not parse request body",
+        "detail": "Could not parse request body as JSON"
     }
 }
 ```
@@ -132,7 +138,10 @@ HTTP/1.1 409 Conflict
 
 {
     "errors": {
-        // a directory with that name already exists
+        "status": "409",
+        "code": "dir_conflict",
+        "title": "directory already exists",
+        "detail": "Could not create '/foo/bar' as it already exists"
     }
 }
 ```
@@ -188,17 +197,23 @@ HTTP/1.1 400 Bad Request
 
 {
     "errors": {
-        // malformed JSON syntax
+        "status": "400",
+        "code": "malformed_json",
+        "title": "could not parse request body",
+        "detail": "Could not parse request body as JSON"
     }
 }
 ```
 
-``` http
+```
 HTTP/1.1 404 Not Found
 
 {
     "errors": {
-        // couldn't find directory specified by path
+        "status": "404",
+        "code": "dir_not_found",
+        "title": "directory does not exist",
+        "detail": "Could not find the directory '/foo/bar'"
     }
 }
 ```
@@ -208,7 +223,10 @@ HTTP/1.1 409 Conflict
 
 {
     "errors": {
-        // a directory with that name already exists
+        "status": "409",
+        "code": "dir_conflict",
+        "title": "directory already exists",
+        "detail": "Could not create '/foo/bar' as it already exists"
     }
 }
 ```
@@ -248,12 +266,15 @@ HTTP/1.1 200 OK
 
 **Errors**
 
-``` http
+```
 HTTP/1.1 404 Not Found
 
 {
     "errors": {
-        // couldn't find page specified by path
+        "status": "404",
+        "code": "file_not_found",
+        "title": "file does not exist",
+        "detail": "Could not find the file '/foo/bar/lorem-ipsum.md'"
     }
 }
 ```
@@ -321,17 +342,23 @@ HTTP/1.1 400 Bad Request
 
 {
     "errors": {
-        // malformed JSON syntax
+        "status": "400",
+        "code": "malformed_json",
+        "title": "could not parse request body",
+        "detail": "Could not parse request body as JSON"
     }
 }
 ```
 
-``` http
+```
 HTTP/1.1 404 Not Found
 
 {
     "errors": {
-        // couldn't find the specified directory
+        "status": "404",
+        "code": "dir_not_found",
+        "title": "directory does not exist",
+        "detail": "Could not find the directory '/foo/bar'"
     }
 }
 ```
@@ -402,18 +429,24 @@ HTTP/1.1 400 Bad Request
 
 {
     "errors": {
-        // malformed JSON syntax
+        "status": "400",
+        "code": "malformed_json",
+        "title": "could not parse request body",
+        "detail": "Could not parse request body as JSON"
     }
 }
 ```
 
 
-``` http
+```
 HTTP/1.1 404 Not Found
 
 {
     "errors": {
-        // couldn't find the specified page
+        "status": "404",
+        "code": "file_not_found",
+        "title": "file does not exist",
+        "detail": "Could not find the file '/foo/bar/lorem-ipsum.md'"
     }
 }
 ```
@@ -470,17 +503,23 @@ HTTP/1.1 400 Bad Request
 
 {
     "errors": {
-        // malformed JSON syntax
+        "status": "400",
+        "code": "malformed_json",
+        "title": "could not parse request body",
+        "detail": "Could not parse request body as JSON"
     }
 }
 ```
 
-``` http
+```
 HTTP/1.1 404 Not Found
 
 {
     "errors": {
-        // couldn't find item specified by source path
+        "status": "404",
+        "code": "file_not_found",
+        "title": "directory does not exist",
+        "detail": "Could not find the file '/foo/bar'"
     }
 }
 ```
@@ -490,7 +529,10 @@ HTTP/1.1 409 Conflict
 
 {
     "errors": {
-        // destination already exists
+        "status": "409",
+        "code": "dir_conflict",
+        "title": "directory already exists",
+        "detail": "Could not create '/foo/bar' as it already exists"
     }
 }
 ```
@@ -521,12 +563,15 @@ HTTP/1.1 204 No Content
 
 **Errors**
 
-``` http
+```
 HTTP/1.1 404 Not Found
 
 {
     "errors": {
-        // couldn't find directory specified by path
+        "status": "404",
+        "code": "file_not_found",
+        "title": "file does not exist",
+        "detail": "Could not find the file '/foo/bar'"
     }
 }
 ```
