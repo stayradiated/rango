@@ -22,7 +22,7 @@ func (err *apiError) Write(w http.ResponseWriter) {
 }
 
 var errInvalidDir = &apiError{
-	Status: http.StatusNotFound,
+	Status: http.StatusBadRequest,
 	Code:   "invalid_dir",
 	Title:  "invalid directory",
 }
