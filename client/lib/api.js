@@ -3,18 +3,44 @@ var Path = require('path');
 
 var BASE_URL = 'api/'
 var DIR = 'dir';
-var FILE = 'file';
 var PAGE = 'page';
 var CONFIG = 'config';
 
 var Rango = {
 
-  createDir: function (path) {
-    return post(DIR, path);
+  // Directories
+
+  readDir: function (path) {
+    return get(DIR, path).then(function (res) {
+      return res.data;
+    });
   },
 
-  createFile: function (path) {
-    return post(FILE, path);
+  createDir: function (path, dirname) {
+    return post(DIR, path, {
+      dir: {
+        name: dirname,
+      },
+    }).then(function (res) {
+      return res.dir;
+    });
+  },
+
+  updateDir: function (path, props) {
+    return put(DIR, path, {
+      dir: props,
+    });
+  },
+
+  deleteDir: function (path) {
+    return del(path);
+  },
+
+
+  // Pages
+
+  readPage: function (path) {
+    return get(PAGE, path);
   },
 
   createPage: function (dirPath, page) {
@@ -24,33 +50,27 @@ var Rango = {
     });
   },
 
-  readDir: function (path) {
-    return get(DIR, path);
+  updatePage: function (path, page) {
+    return put(PAGE, path, { page: page });
   },
 
-  readFile: function (path) {
-    return get(FILE, path);
+  destroy: function (path) {
+    return del(path);
   },
+
   
-  readPage: function (path) {
-    return get(PAGE, path);
-  },
+  // Config
 
   readConfig: function () {
     return get(CONFIG, '');
   },
 
-  updateFile: function (path, contents) {
-    return put(FILE, path, { data: contents });
-  },
-
-  updatePage: function (path, page) {
-    return put(PAGE, path, { page: page });
-  },
-
   updateConfig: function (config) {
     return put(CONFIG, '', { config: config });
   },
+
+
+  // Files
 
   copy: function (src, dst) {
     return post('copy', src, { destination: dst });
@@ -62,13 +82,6 @@ var Rango = {
     });
   },
 
-  rename: function (path, name) {
-    return put('rename', path, { name: name });
-  },
-
-  destroy: function (path) {
-    return del(path);
-  },
 
 };
 

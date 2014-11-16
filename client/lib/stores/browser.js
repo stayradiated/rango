@@ -104,9 +104,7 @@ var BrowserStore = Fluxxor.createStore({
     var name = window.prompt('Enter a name for the new directory');
     if (! name) { return; }
 
-    var path = Path.join(this.getPath(), name);
-
-    return Rango.createDir(path).then(function () {
+    return Rango.createDir(this.getPath(), name).then(function () {
       self.fetchContents();
     });
   },
