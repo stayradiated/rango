@@ -10,13 +10,21 @@ import (
 func main() {
 	// negroni + mux
 	n := negroni.New()
-	r := mux.NewRouter()
 
 	// setup middleware
 	n.Use(negroni.NewRecovery())
 	n.Use(negroni.NewLogger())
 	n.Use(negroni.NewStatic(http.Dir("./client/dist/")))
-	n.UseHandler(r)
+
+	// listen to handlers
+	n.UseHandler(Handlers())
+
+	// start server
+	n.Run(":8080")
+}
+
+func Handlers() *mux.Router {
+	r := mux.NewRouter()
 
 	// API prefix
 	api := r.PathPrefix("/api").Subrouter()
@@ -42,6 +50,5 @@ func main() {
 	// DELETE (destroy)
 	api.HandleFunc("/{path:.*}", handleDestroy).Methods("DELETE")
 
-	// start server
-	n.Run(":8080")
+	return r
 }
