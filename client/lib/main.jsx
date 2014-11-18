@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; 
 
 var jQuery    = require('jquery');
 var fastclick = require('fastclick');

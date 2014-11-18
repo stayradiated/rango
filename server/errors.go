@@ -32,8 +32,14 @@ var errInvalidDir = newApiError(http.StatusBadRequest,
 var errDirNotFound = newApiError(http.StatusNotFound,
 	"Directory does not exist")
 
+var errPageNotFound = newApiError(http.StatusNotFound,
+	"Page does not exist")
+
 var errMalformedJson = newApiError(http.StatusBadRequest,
 	"Could not parse request body")
 
 var errDirConflict = newApiError(http.StatusConflict,
 	"Directory already exists")
+
+var errNoMeta = newApiError(http.StatusBadRequest,
+	"page[meta] not sent in request")

@@ -1,8 +1,9 @@
 'use strict';
 
+var _ = require('lodash');
 var Constants = require('./constants');
 
-module.exports = {
+_.extend(exports, {
   open: {
     directory: dispatch('OPEN_DIRECTORY'),
     parent: dispatch('OPEN_PARENT_DIRECTORY'),
@@ -26,7 +27,7 @@ module.exports = {
   publish: {
     site: dispatch('PUBLISH_SITE'),
   },
-};
+});
 
 function dispatch (constant) {
   return function (args) {

@@ -1,3 +1,6 @@
+'use strict';
+
+var _ = require('lodash');
 var jQuery = require('jquery');
 var Path = require('path');
 
@@ -6,7 +9,7 @@ var DIR = 'dir';
 var PAGE = 'page';
 var CONFIG = 'config';
 
-var Rango = {
+_.extend(exports, {
 
   // Directories
 
@@ -82,8 +85,7 @@ var Rango = {
     });
   },
 
-
-};
+});
 
 function get (method, path) {
   return jQuery.ajax({
@@ -93,12 +95,12 @@ function get (method, path) {
   });
 }
 
-function post (method, path, data) {
+function post (method, path, params) {
   return jQuery.ajax({
     type: 'post',
     url: Path.join(BASE_URL, method, path),
     dataType: 'json',
-    data: data,
+    data: params,
   });
 }
 
@@ -107,7 +109,7 @@ function put (method, path, params) {
     type: 'put',
     url: Path.join(BASE_URL, method, path),
     dataType: 'json',
-    data: data,
+    data: params,
   });
 }
 
@@ -118,5 +120,3 @@ function del (path) {
     dataType: 'json',
   });
 }
-
-module.exports = Rango;

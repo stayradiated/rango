@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+func fileExists(fp string) bool {
+	info, err := os.Stat(fp)
+	if err != nil {
+		return false
+	}
+	return info.IsDir() == false
+}
+
 func dirExists(fp string) bool {
 	info, err := os.Stat(fp)
 	if err != nil {
@@ -17,7 +25,7 @@ func dirExists(fp string) bool {
 	return info.IsDir()
 }
 
-func sanitizePath(p string) (string, error) {
+func convertPath(p string) (string, error) {
 	err := errors.New("invalid path")
 
 	// join path with content folder
