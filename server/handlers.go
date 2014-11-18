@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -19,6 +19,18 @@ import (
 //  |__/ | |  \ |___ \__,  |  \__/ |  \ | |___ .__/
 //
 
+type handleReadDirResponse struct {
+	Data []*rangolib.File `json:"data"`
+}
+
+type handleCreateDirResponse struct {
+	Dir *rangolib.File `json:"dir"`
+}
+
+type handleUpdateDirResponse struct {
+	Dir *rangolib.File `json:"dir"`
+}
+
 // handleReadDir reads contents of a directory
 func handleReadDir(w http.ResponseWriter, req *http.Request) {
 	fp, err := sanitizePath(mux.Vars(req)["path"])
@@ -27,24 +39,19 @@ func handleReadDir(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// check that directory exists
-	if dirExists(fp) == false {
-		errDirNotFound.Write(w)
-		return
-	}
-
 	// try and read contents of dir
-	contents, err := rangolib.DirContents(fp)
+	contents, err := rangolib.ReadDir(fp)
 	if err != nil {
 		errDirNotFound.Write(w)
 		return
 	}
 
-	printJson(w, struct {
-		Data []*rangolib.File `json:"data"`
-	}{
-		Data: contents,
-	})
+	// trim content prefix
+	for _, item := range contents {
+		item.Path = strings.TrimPrefix(item.Path, contentDir)
+	}
+
+	printJson(w, &handleReadDirResponse{Data: contents})
 }
 
 // handleCreateDir creates a directory
@@ -66,30 +73,17 @@ func handleCreateDir(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// make directory
-	if err = os.MkdirAll(fp, 0755); err != nil {
-		NewApiError(err).Write(w)
-		return
-	}
-
-	// check that directory was created
-	info, err := os.Stat(fp)
+	dir, err := rangolib.CreateDir(fp)
 	if err != nil {
-		NewApiError(err).Write(w)
+		wrapError(err).Write(w)
 		return
 	}
 
-	// convert fileinfo into something we can print
-	dir := &rangolib.File{
-		Path: strings.TrimPrefix(fp, CONTENT_DIR),
-	}
-	dir.Load(info)
+	// trim content prefix
+	dir.Path = strings.TrimPrefix(dir.Path, contentDir)
 
 	// print info
-	printJson(w, struct {
-		Dir *rangolib.File `json:"dir"`
-	}{
-		Dir: dir,
-	})
+	printJson(w, &handleCreateDirResponse{Dir: dir})
 }
 
 // handleUpdateDir renames a directory
@@ -101,7 +95,7 @@ func handleUpdateDir(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// check that the specified directory is not the root content folder
-	if fp == CONTENT_DIR {
+	if fp == contentDir {
 		errInvalidDir.Write(w)
 		return
 	}
@@ -114,34 +108,18 @@ func handleUpdateDir(w http.ResponseWriter, req *http.Request) {
 
 	// combine parent dir with dir name
 	parent := filepath.Dir(fp)
-	dirname := req.FormValue("dir[name]")
+	dirname := sanitize.Path(req.FormValue("dir[name]"))
 	dest := filepath.Join(parent, dirname)
 
 	// rename directory
-	if err = os.Rename(fp, dest); err != nil {
-		NewApiError(err).Write(w)
-		return
-	}
-
-	// check that directory was created
-	info, err := os.Stat(dest)
+	dir, err := rangolib.UpdateDir(fp, dest)
 	if err != nil {
-		NewApiError(err).Write(w)
+		wrapError(err).Write(w)
 		return
 	}
-
-	// convert fileinfo into something we can print
-	dir := &rangolib.File{
-		Path: strings.TrimPrefix(dest, CONTENT_DIR),
-	}
-	dir.Load(info)
 
 	// print info
-	printJson(w, struct {
-		Dir *rangolib.File `json:"dir"`
-	}{
-		Dir: dir,
-	})
+	printJson(w, &handleUpdateDirResponse{Dir: dir})
 }
 
 // handleDeleteDir deletes a directory
@@ -153,7 +131,7 @@ func handleDeleteDir(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// check that the specified directory is not the root content folder
-	if fp == CONTENT_DIR {
+	if fp == contentDir {
 		errInvalidDir.Write(w)
 		return
 	}
@@ -164,9 +142,9 @@ func handleDeleteDir(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// remove the directory
-	if err = os.RemoveAll(fp); err != nil {
-		NewApiError(err).Write(w)
+	// remove directory
+	if err = rangolib.DeleteDir(fp); err != nil {
+		wrapError(err).Write(w)
 		return
 	}
 

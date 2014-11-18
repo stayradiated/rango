@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
-	"os"
-	"path"
-	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/spf13/cast"
@@ -19,45 +16,6 @@ const TOML = '+'
 type Page struct {
 	Metadata map[string]interface{} `json:"metadata"`
 	Content  string                 `json:"content"`
-}
-
-type File struct {
-	Name    string `json:"name"`
-	Path    string `json:"path"`
-	IsDir   bool   `json:"isDir"`
-	Size    int64  `json:"size"`
-	ModTime int64  `json:"mtime"`
-}
-
-func (f *File) Load(info os.FileInfo) {
-	f.Name = info.Name()
-	f.IsDir = info.IsDir()
-	f.Size = info.Size()
-	f.ModTime = info.ModTime().Unix()
-}
-
-func NewFile(dirname string, info os.FileInfo) *File {
-	path := path.Join(dirname, info.Name())
-	path = strings.TrimPrefix(path, "content")
-
-	file := &File{Path: path}
-	file.Load(info)
-	return file
-}
-
-func DirContents(dirname string) ([]*File, error) {
-	files := make([]*File, 0)
-	contents, err := ioutil.ReadDir(dirname)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, info := range contents {
-		file := NewFile(dirname, info)
-		files = append(files, file)
-	}
-
-	return files, nil
 }
 
 func Read(file io.Reader) (page *Page, err error) {

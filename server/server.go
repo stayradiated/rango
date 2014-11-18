@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"net/http"
@@ -7,14 +7,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const CONTENT_DIR = "content"
+var contentDir = "content"
 
 // main starts the web server
-func main() {
-	// negroni + mux
-	n := negroni.New()
+func Start() *negroni.Negroni {
 
 	// setup middleware
+	n := negroni.New()
 	n.Use(negroni.NewRecovery())
 	n.Use(negroni.NewLogger())
 	n.Use(negroni.NewStatic(http.Dir("./client/dist/")))
@@ -23,8 +22,8 @@ func main() {
 	// listen to handlers
 	n.UseHandler(Handlers())
 
-	// start server
-	n.Run(":8080")
+	// return negroni
+	return n
 }
 
 // Handlers connects the handlers to a new router

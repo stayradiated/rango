@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -21,10 +21,10 @@ func sanitizePath(p string) (string, error) {
 	err := errors.New("invalid path")
 
 	// join path with content folder
-	fp := path.Join(CONTENT_DIR, p)
+	fp := path.Join(contentDir, p)
 
 	// check that path still starts with content dir
-	if !strings.HasPrefix(fp, CONTENT_DIR) {
+	if !strings.HasPrefix(fp, contentDir) {
 		return fp, err
 	}
 
@@ -37,11 +37,7 @@ func sanitizePath(p string) (string, error) {
 }
 
 func printError(w io.Writer, err interface{}) {
-	printJson(w, struct {
-		Errors interface{} `json:"errors"`
-	}{
-		Errors: err,
-	})
+	printJson(w, err)
 }
 
 func printJson(w io.Writer, obj interface{}) {
