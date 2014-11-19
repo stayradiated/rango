@@ -114,20 +114,75 @@ func CreatePage(dirname string, metadata map[string]interface{}, content []byte)
 	}, nil
 }
 
-func UpdatePage(name string, metadata map[string]interface{}, content []byte) error {
-	page, err := hugolib.NewPage(name)
-	if err != nil {
-		return err
+func UpdatePage(fp string, metadata map[string]interface{}, content []byte) (*Page, error) {
+	// check that title has been specified
+	t, ok := metadata["title"]
+	if ok == false {
+		return nil, errors.New("page[meta].title must be specified")
 	}
 
+	// check that title is a string
+	title, ok := t.(string)
+	if ok == false {
+		return nil, errors.New("page[meta].title must be a string")
+	}
+
+	// delete existing page
+	err := DeletePage(fp)
+	if err != nil {
+		return nil, err
+	}
+
+	// the filepath for the page
+	// var fp string
+	dirname := filepath.Dir(fp)
+	count := 0
+
+	// generate filename based on title
+	// if the filename already exists, add a number on the end
+	// if that exists, increment the number by one until we find a filename
+	// that doesn't exist
+	for {
+
+		// combine title with count
+		tmpTitle := title
+		if count != 0 {
+			tmpTitle += " " + strconv.Itoa(count)
+		}
+
+		filename := sanitize.Path(tmpTitle + ".md")
+		fp = filepath.Join(dirname, filename)
+
+		// only stop looping when file doesn't already exist
+		if _, err := os.Stat(fp); err != nil {
+			break
+		}
+
+		// add 1 to title
+		count += 1
+	}
+
+	// create new hugo page
+	page, err := hugolib.NewPage(fp)
+	if err != nil {
+		return nil, err
+	}
+
+	// set attributes
 	page.SetSourceMetaData(metadata, TOML)
 	page.SetSourceContent(content)
 
-	if err = page.SafeSaveSourceAs(name); err != nil {
-		return err
+	// save page
+	if err = page.SafeSaveSourceAs(fp); err != nil {
+		return nil, err
 	}
 
-	return nil
+	// return page info
+	return &Page{
+		Path:     fp,
+		Metadata: metadata,
+		Content:  string(content),
+	}, nil
 }
 
 func DeletePage(fp string) error {

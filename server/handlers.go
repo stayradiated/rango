@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"path/filepath"
@@ -201,7 +200,7 @@ func handleCreatePage(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// check that parent dir exists
-	if dirExists(fp) == false {
+	if fileExists(fp) || dirExists(fp) == false {
 		errDirNotFound.Write(w)
 		return
 	}
@@ -240,24 +239,36 @@ func handleUpdatePage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// check that existing page exists
+	if dirExists(fp) || fileExists(fp) == false {
+		errPageNotFound.Write(w)
+		return
+	}
+
+	metastring := req.FormValue("page[meta]")
+	if len(metastring) == 0 {
+		errNoMeta.Write(w)
+	}
+
 	metadata := map[string]interface{}{}
-	err = json.Unmarshal([]byte(req.FormValue("metadata")), &metadata)
+	err = json.Unmarshal([]byte(metastring), &metadata)
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
 	}
 
-	rawTitle, ok := metadata["title"]
-	if !ok {
-		fmt.Fprint(w, errors.New("Must specify title in metadata"))
+	content := []byte(req.FormValue("page[content]"))
+
+	page, err := rangolib.UpdatePage(fp, metadata, content)
+	if err != nil {
+		wrapError(err).Write(w)
 		return
 	}
-	title := sanitize.Path(rawTitle.(string) + ".md")
-	fp = filepath.Join(fp, title)
 
-	content := []byte(req.FormValue("content"))
+	// trim content prefix from path
+	page.Path = strings.TrimPrefix(page.Path, contentDir)
 
-	rangolib.UpdatePage(fp, metadata, content)
+	printJson(w, &handleUpdatePageResponse{Page: page})
 }
 
 // handleDeletePage deletes a page
