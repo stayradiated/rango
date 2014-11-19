@@ -1,4 +1,4 @@
-package fstools
+package rangolib
 
 import (
 	"io"
@@ -51,4 +51,19 @@ func (c *treeCopier) Walk(path string, info os.FileInfo, err error) error {
 	}
 
 	return nil
+}
+
+// copyDir copies a directory to another location (including sub-directories)
+func copyDir(srcRoot, destRoot string) error {
+	c := &treeCopier{srcRoot: srcRoot, destRoot: destRoot}
+	return filepath.Walk(srcRoot, c.Walk)
+}
+
+// moveDir moves a directory to another location (include sub-directories)
+func moveDir(srcRoot, destRoot string) error {
+	err := copyDir(srcRoot, destRoot)
+	if err != nil {
+		return err
+	}
+	return os.RemoveAll(srcRoot)
 }

@@ -4,8 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	"github.com/stayradiated/rango/fstools"
 )
 
 type File struct {
@@ -68,7 +66,7 @@ func CreateDir(dirname string) (*File, error) {
 func UpdateDir(src string, dest string) (*File, error) {
 
 	// move directory including it's contents
-	if err := fstools.MoveDir(src, dest); err != nil {
+	if err := moveDir(src, dest); err != nil {
 		return nil, err
 	}
 

@@ -1,13 +1,16 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/stayradiated/afero"
+	"github.com/stayradiated/rango/rangofs"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -17,36 +20,32 @@ var (
 )
 
 func init() {
-	contentDir = "test_content"
+	contentDir = "content"
+	rangofs.Fs = new(afero.MemMapFs)
+
+	rangofs.Fs.Mkdir("content", 0755)
 
 	server = httptest.NewServer(Start())
 	dirUrl = fmt.Sprintf("%s/api/dir", server.URL)
 }
 
 func TestReadDir(t *testing.T) {
-	reader = strings.NewReader("")
+	assert := assert.New(t)
 
 	url := dirUrl + "/"
+	reader = strings.NewReader("")
 
-	req, err := http.NewRequest("GET", url, reader)
-	if err != nil {
-		t.Error(err)
-	}
-
+	req, _ := http.NewRequest("POST", url, reader)
 	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Error(err)
-	}
+	assert.Nil(err)
 
-	if res.StatusCode != http.StatusOK {
-		t.Errorf("Success expected: %d", res.StatusCode)
-	}
+	assert.Equal(res.StatusCode, http.StatusOK)
 
-	body := new(handleReadDirResponse)
-	err = json.NewDecoder(res.Body).Decode(body)
-	if err != nil {
-		t.Error(err)
-	}
+	// body := new(handleReadDirResponse)
+	fmt.Println(res.Body)
 
-	fmt.Println(body.Data[0])
+	// err = json.NewDecoder(res.Body).Decode(body)
+	// assert.Nil(err)
+
+	// fmt.Println(body.Data[0])
 }

@@ -49,6 +49,8 @@ func handleReadDir(w http.ResponseWriter, req *http.Request) {
 		item.Path = strings.TrimPrefix(item.Path, contentDir)
 	}
 
+	fmt.Println("contents", contents)
+
 	printJson(w, &handleReadDirResponse{Data: contents})
 }
 
