@@ -1,6 +1,7 @@
 package rangolib
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -65,13 +66,19 @@ func CreateDir(dirname string) (*File, error) {
 // UpdateDir renames an existing directory
 func UpdateDir(src string, dest string) (*File, error) {
 
+	// check that destination doesn't exist
+	info, err := os.Stat(dest)
+	if info != nil {
+		return nil, errors.New("Cannot overwrite destination")
+	}
+
 	// move directory including it's contents
 	if err := moveDir(src, dest); err != nil {
 		return nil, err
 	}
 
 	// check that directory was created
-	info, err := os.Stat(dest)
+	info, err = os.Stat(dest)
 	if err != nil {
 		return nil, err
 	}
@@ -82,6 +89,15 @@ func UpdateDir(src string, dest string) (*File, error) {
 
 // DeleteDir will delete a directory and it's contents
 func DeleteDir(dirname string) error {
+
+	dir, err := os.Stat(dirname)
+	if err != nil {
+		return err
+	}
+
+	if dir.IsDir() == false {
+		return errors.New("DeleteDir can only delete directories")
+	}
 
 	// remove the directory
 	return os.RemoveAll(dirname)

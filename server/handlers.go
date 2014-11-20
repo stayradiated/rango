@@ -49,8 +49,6 @@ func handleReadDir(w http.ResponseWriter, req *http.Request) {
 		item.Path = strings.TrimPrefix(item.Path, contentDir)
 	}
 
-	fmt.Println("contents", contents)
-
 	printJson(w, &handleReadDirResponse{Data: contents})
 }
 
@@ -136,12 +134,6 @@ func handleDeleteDir(w http.ResponseWriter, req *http.Request) {
 	// check that the specified directory is not the root content folder
 	if fp == contentDir {
 		errInvalidDir.Write(w)
-		return
-	}
-
-	// check that directory exists
-	if dirExists(fp) == false {
-		errDirNotFound.Write(w)
 		return
 	}
 

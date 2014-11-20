@@ -18,22 +18,29 @@ func (c *treeCopier) visitDir(src string, info os.FileInfo) error {
 	return os.Mkdir(c.convertPath(src), info.Mode())
 }
 
-func (c *treeCopier) visitFile(src string, info os.FileInfo) (int64, error) {
+// based on https://gist.github.com/elazarl/5507969
+func (c *treeCopier) visitFile(src string, info os.FileInfo) error {
 	dest := c.convertPath(src)
 
 	sf, err := os.Open(src)
 	if err != nil {
-		return 0, err
+		return err
 	}
+	// no need to check errors on read only file, we already got everything
+	// we need from the filesystem, so nothing can go wrong now.
 	defer sf.Close()
 
 	df, err := os.Create(dest)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	defer df.Close()
 
-	return io.Copy(df, sf)
+	if _, err := io.Copy(df, sf); err != nil {
+		df.Close()
+		return err
+	}
+
+	return df.Close()
 }
 
 func (c *treeCopier) Walk(path string, info os.FileInfo, err error) error {
