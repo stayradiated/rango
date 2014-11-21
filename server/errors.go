@@ -46,3 +46,6 @@ var errNoMeta = newApiError(http.StatusBadRequest,
 
 var errInvalidJson = newApiError(http.StatusBadRequest,
 	"Malformed JSON")
+
+var errNoConfig = newApiError(http.StatusNotFound,
+	"Could not find config file")

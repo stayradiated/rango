@@ -1,35 +1,25 @@
 title = "That is awesome"
 
 [rango]
-
-[rango.types]
-
-[rango.types.default]
-  [rango.types.default.images]
-  type = "image"
-  array = true
-
-[rango.types.contact]
-  [rango.types.contact.images]
-  type = "image"
-  array = true
-
-[rango.types.carousel]
-  [rango.types.carousel.images]
-  type = "image"
-  array = true
-
-  [rango.types.carousel.part]
-  type = "text"
-
-  [rango.types.carousel.details]
-  type = "text"
-  array = true
-
-  [rango.types.carousel.galleries]
-  type = "text"
-  array = true
-  dropdown = [
-    "Current Work", 
-    "Previous Work",
-  ]
+  [rango.types]
+    [rango.types.carousel]
+      [rango.types.carousel.details]
+        array = true
+        type = "text"
+      [rango.types.carousel.galleries]
+        array = true
+        dropdown = ["Current Work", "Previous Work"]
+        type = "text"
+      [rango.types.carousel.images]
+        array = true
+        type = "image"
+      [rango.types.carousel.part]
+        type = "text"
+    [rango.types.contact]
+      [rango.types.contact.images]
+        array = true
+        type = "image"
+    [rango.types.default]
+      [rango.types.default.images]
+        array = true
+        type = "image"

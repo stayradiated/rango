@@ -289,25 +289,32 @@ func handleDeletePage(w http.ResponseWriter, req *http.Request) {
 func handleReadConfig(w http.ResponseWriter, req *http.Request) {
 	config, err := rangolib.ReadConfig()
 	if err != nil {
-		fmt.Fprint(w, err)
+		errNoConfig.Write(w)
 		return
 	}
+
 	printJson(w, config)
 }
 
 // handleUpdateConfig writes json data to a config file
 func handleUpdateConfig(w http.ResponseWriter, req *http.Request) {
+
+	// parse the config
 	config := rangolib.Frontmatter{}
-
-	if err := json.Unmarshal([]byte(req.FormValue("config")), &config); err != nil {
-		fmt.Fprint(w, err)
+	err := json.Unmarshal([]byte(req.FormValue("config")), &config)
+	if err != nil {
+		errInvalidJson.Write(w)
 		return
 	}
 
+	// save config
 	if err := rangolib.SaveConfig(config); err != nil {
-		fmt.Fprint(w, err)
+		wrapError(err).Write(w)
 		return
 	}
+
+	// don't need to send anything back
+	w.WriteHeader(http.StatusNoContent)
 }
 
 //  ┌─┐┬┬  ┌─┐┌─┐
