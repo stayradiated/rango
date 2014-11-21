@@ -138,7 +138,7 @@ func handleDeleteDir(w http.ResponseWriter, req *http.Request) {
 
 	// remove directory
 	if err = rangolib.DeleteDir(fp); err != nil {
-		wrapError(err).Write(w)
+		errDirNotFound.Write(w)
 		return
 	}
 
@@ -205,7 +205,7 @@ func handleCreatePage(w http.ResponseWriter, req *http.Request) {
 	metadata := rangolib.Frontmatter{}
 	err = json.Unmarshal([]byte(metastring), &metadata)
 	if err != nil {
-		fmt.Fprint(w, err)
+		errInvalidJson.Write(w)
 		return
 	}
 
@@ -273,7 +273,7 @@ func handleDeletePage(w http.ResponseWriter, req *http.Request) {
 
 	// delete page
 	if err = rangolib.DeletePage(fp); err != nil {
-		wrapError(err).Write(w)
+		errPageNotFound.Write(w)
 		return
 	}
 

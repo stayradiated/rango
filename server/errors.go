@@ -43,3 +43,6 @@ var errDirConflict = newApiError(http.StatusConflict,
 
 var errNoMeta = newApiError(http.StatusBadRequest,
 	"page[meta] not sent in request")
+
+var errInvalidJson = newApiError(http.StatusBadRequest,
+	"Malformed JSON")
