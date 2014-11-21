@@ -12,10 +12,9 @@ import (
 	"github.com/stayradiated/rango/rangolib"
 )
 
-//   __     __   ___  __  ___  __   __     ___  __
-//  |  \ | |__) |__  /  `  |  /  \ |__) | |__  /__`
-//  |__/ | |  \ |___ \__,  |  \__/ |  \ | |___ .__/
-//
+//  ┌┬┐┬┬─┐┌─┐┌─┐┌┬┐┌─┐┬─┐┬┌─┐┌─┐
+//   │││├┬┘├┤ │   │ │ │├┬┘│├┤ └─┐
+//  ─┴┘┴┴└─└─┘└─┘ ┴ └─┘┴└─┴└─┘└─┘
 
 type handleReadDirResponse struct {
 	Data []*rangolib.File `json:"data"`
@@ -146,10 +145,9 @@ func handleDeleteDir(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-//   __        __   ___  __
-//  |__)  /\  / _` |__  /__`
-//  |    /~~\ \__> |___ .__/
-//
+//  ┌─┐┌─┐┌─┐┌─┐┌─┐
+//  ├─┘├─┤│ ┬├┤ └─┐
+//  ┴  ┴ ┴└─┘└─┘└─┘
 
 type handleReadPageResponse struct {
 	Page *rangolib.Page `json:"page"`
@@ -204,7 +202,7 @@ func handleCreatePage(w http.ResponseWriter, req *http.Request) {
 		errNoMeta.Write(w)
 	}
 
-	metadata := map[string]interface{}{}
+	metadata := rangolib.Frontmatter{}
 	err = json.Unmarshal([]byte(metastring), &metadata)
 	if err != nil {
 		fmt.Fprint(w, err)
@@ -244,7 +242,7 @@ func handleUpdatePage(w http.ResponseWriter, req *http.Request) {
 		errNoMeta.Write(w)
 	}
 
-	metadata := map[string]interface{}{}
+	metadata := rangolib.Frontmatter{}
 	err = json.Unmarshal([]byte(metastring), &metadata)
 	if err != nil {
 		fmt.Fprint(w, err)
@@ -289,10 +287,9 @@ func handleDeletePage(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-//   __   __        ___    __
-//  /  ` /  \ |\ | |__  | / _`
-//  \__, \__/ | \| |    | \__>
-//
+//  ┌─┐┌─┐┌┐┌┌─┐┬┌─┐
+//  │  │ ││││├┤ ││ ┬
+//  └─┘└─┘┘└┘└  ┴└─┘
 
 // handleReadConfig reads data from a config
 func handleReadConfig(w http.ResponseWriter, req *http.Request) {
@@ -306,7 +303,7 @@ func handleReadConfig(w http.ResponseWriter, req *http.Request) {
 
 // handleUpdateConfig writes json data to a config file
 func handleUpdateConfig(w http.ResponseWriter, req *http.Request) {
-	config := map[string]interface{}{}
+	config := rangolib.Frontmatter{}
 
 	if err := json.Unmarshal([]byte(req.FormValue("config")), &config); err != nil {
 		fmt.Fprint(w, err)
@@ -319,10 +316,9 @@ func handleUpdateConfig(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-//   ___         ___  __
-//  |__  | |    |__  /__`
-//  |    | |___ |___ .__/
-//
+//  ┌─┐┬┬  ┌─┐┌─┐
+//  ├┤ ││  ├┤ └─┐
+//  └  ┴┴─┘└─┘└─┘
 
 // handleCopy copies a page to a new file
 func handleCopy(w http.ResponseWriter, req *http.Request) {

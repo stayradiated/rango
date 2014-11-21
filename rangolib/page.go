@@ -15,33 +15,44 @@ import (
 const TOML = '+'
 const YAML = '-'
 
+// Frontmatter stores encodeable data
+type Frontmatter map[string]interface{}
+
+// Page represents a markdown file
 type Page struct {
-	Path     string                 `json:"path"`
-	Metadata map[string]interface{} `json:"metadata"`
-	Content  string                 `json:"content"`
+	Path     string      `json:"path"`
+	Metadata Frontmatter `json:"metadata"`
+	Content  string      `json:"content"`
 }
 
+// ReadPage reads a page from disk
 func ReadPage(fp string) (*Page, error) {
+	// open the file for reading
 	file, err := os.Open(fp)
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 
+	// use the Hugo parser lib to read the contents
 	parser, err := parser.ReadFrom(file)
 	if err != nil {
 		return nil, err
 	}
 
+	// get the metadata
 	rawdata, err := parser.Metadata()
 	if err != nil {
 		return nil, err
 	}
 
+	// convert the interface{} into map[string]interface{}
 	metadata, err := cast.ToStringMapE(rawdata)
 	if err != nil {
 		return nil, err
 	}
 
+	// assemble a new Page instance
 	return &Page{
 		Path:     fp,
 		Metadata: metadata,
@@ -49,7 +60,7 @@ func ReadPage(fp string) (*Page, error) {
 	}, nil
 }
 
-func CreatePage(dirname string, metadata map[string]interface{}, content []byte) (*Page, error) {
+func CreatePage(dirname string, metadata Frontmatter, content []byte) (*Page, error) {
 
 	// check that title has been specified
 	t, ok := metadata["title"]
@@ -114,7 +125,7 @@ func CreatePage(dirname string, metadata map[string]interface{}, content []byte)
 	}, nil
 }
 
-func UpdatePage(fp string, metadata map[string]interface{}, content []byte) (*Page, error) {
+func UpdatePage(fp string, metadata Frontmatter, content []byte) (*Page, error) {
 	// check that title has been specified
 	t, ok := metadata["title"]
 	if ok == false {

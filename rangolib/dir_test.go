@@ -8,13 +8,6 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-const SIMPLE_PAGE = `
-+++
-title = "Simple Page"
-+++
-# Hello World
-`
-
 type DirTestSuite struct {
 	suite.Suite
 }

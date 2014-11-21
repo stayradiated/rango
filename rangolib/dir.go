@@ -12,7 +12,7 @@ type File struct {
 	Path    string `json:"path"`
 	IsDir   bool   `json:"isDir"`
 	Size    int64  `json:"size"`
-	ModTime int64  `json:"mtime"`
+	ModTime int64  `json:"modTime"`
 }
 
 func (f *File) Load(info os.FileInfo) {
@@ -31,15 +31,17 @@ func NewFile(path string, info os.FileInfo) *File {
 
 // ReadDir lists the contents of a directory
 func ReadDir(dirname string) ([]*File, error) {
-	files := make([]*File, 0)
 	contents, err := ioutil.ReadDir(dirname)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, info := range contents {
-		file := NewFile(filepath.Join(dirname, info.Name()), info)
-		files = append(files, file)
+	// make a new slice of File's to hold the dir contents
+	files := make([]*File, len(contents))
+
+	// convert os.FileInfo into Files
+	for i, info := range contents {
+		files[i] = NewFile(filepath.Join(dirname, info.Name()), info)
 	}
 
 	return files, nil
@@ -90,11 +92,13 @@ func UpdateDir(src string, dest string) (*File, error) {
 // DeleteDir will delete a directory and it's contents
 func DeleteDir(dirname string) error {
 
+	// check that directory exists
 	dir, err := os.Stat(dirname)
 	if err != nil {
 		return err
 	}
 
+	// check that directory is a directory
 	if dir.IsDir() == false {
 		return errors.New("DeleteDir can only delete directories")
 	}
