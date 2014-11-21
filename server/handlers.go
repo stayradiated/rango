@@ -271,12 +271,6 @@ func handleDeletePage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// check that page exists
-	if fileExists(fp) == false {
-		errPageNotFound.Write(w)
-		return
-	}
-
 	// delete page
 	if err = rangolib.DeletePage(fp); err != nil {
 		wrapError(err).Write(w)
