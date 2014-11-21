@@ -6,10 +6,16 @@ var Fluxxor   = require('fluxxor');
 var Constants = require('../constants');
 var Rango     = require('../api');
 
+var emptyPage = Immutable.fromJS({
+  content: '',
+  metadata: {},
+});
+
 var EditorStore = Fluxxor.createStore({
 
   actions: {
     OPEN_PAGE: 'handleOpenPage',
+    SAVE_PAGE: 'handleSavePage',
   },
 
   initialize: function () {
@@ -20,10 +26,7 @@ var EditorStore = Fluxxor.createStore({
       path: '',
 
       // the directories and pages in the current path
-      page: {
-        content: '',
-        metadata: {},
-      },
+      page: emptyPage,
 
     });
   },
@@ -33,10 +36,7 @@ var EditorStore = Fluxxor.createStore({
     var self = this;
 
     // empty content while we are waiting
-    this.state = this.state.set('page', Immutable.fromJS({
-      metadata:  {},
-      content:   '',
-    }));
+    this.state = this.state.set('page', emptyPage);
     self.emit('change');
 
     Rango.readPage(this.state.get('path')).then(function (page) {
@@ -49,6 +49,25 @@ var EditorStore = Fluxxor.createStore({
   handleOpenPage: function (filename) {
     this.state = this.state.set('path', filename);
     this.fetchPage();
+  },
+
+  // save the current page back to the server
+  handleSavePage: function () {
+    var self = this;
+
+    Rango.updatePage(
+      this.state.get('path'),
+      this.state.get('page').toJS()
+    ).then(function (page) {
+      self.state = Immutable.fromJS({
+        path: page.path,
+        page: {
+          content: page.content,
+          metadata: page.metadata,
+        },
+      })
+      self.emit('change');
+    })
   },
 
 });

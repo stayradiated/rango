@@ -20,23 +20,14 @@ var BrowserTable = React.createClass({
   },
 
   render: function () {
-    var rows = [];
     var contents = this.props.browser.get('contents');
     var selected = this.props.browser.get('selected');
 
-    contents.get('directories').forEach(function (item) {
-      rows.push(
-        <BrowserDirectory
-          key={item.get('name')}
-          item={item}
-          selected={selected.contains(item)}
-        />
-      );
-    });
+    var rows = contents.toArray().map(function (item) {
+      var Type = item.get('isDir') ? BrowserDirectory : BrowserFile;
 
-    contents.get('pages').forEach(function (item) {
-      rows.push(
-        <BrowserFile
+      return (
+        <Type
           key={item.get('name')}
           item={item}
           selected={selected.contains(item)}

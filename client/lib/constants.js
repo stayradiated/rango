@@ -2,18 +2,20 @@
 
 var Constants = {
 
-  OPEN_PATH:              null,
   OPEN_DIRECTORY:         null,
   OPEN_PARENT_DIRECTORY:  null,
+  OPEN_PATH:              null,
+  OPEN_PAGE:              null,
 
   CREATE_PAGE:            null,
   CREATE_DIRECTORY:       null,
 
   SELECT_FILE:            null,
   DESELECT_ALL:           null,
+
   REMOVE_SELECTED_FILES:  null,
 
-  OPEN_PAGE:              null,
+  SAVE_PAGE:              null,
 
   ROUTE_BROWSER:          null,
   ROUTE_EDITOR:           null,

@@ -32,10 +32,7 @@ var BrowserStore = Fluxxor.createStore({
       path: [],
 
       // the directories and pages in the current path
-      contents: {
-        directories: [],
-        pages: [],
-      },
+      contents: [],
 
       // a set of selected pages and directories
       selected: Immutable.Set(),

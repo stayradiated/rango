@@ -32,6 +32,8 @@ _.extend(exports, {
   updateDir: function (path, props) {
     return put(DIR, path, {
       dir: props,
+    }).then(function (res) {
+      return res.dir;
     });
   },
 
@@ -43,18 +45,31 @@ _.extend(exports, {
   // Pages
 
   readPage: function (path) {
-    return get(PAGE, path);
+    return get(PAGE, path).then(function (res) {
+      return res.page;
+    });
   },
 
   createPage: function (dirPath, page) {
     return post(PAGE, dirPath, {
-      metadata: JSON.stringify(page.metadata),
-      content: page.content,
+      page: {
+        meta: JSON.stringify(page.metadata),
+        content: page.content,
+      },
+    }).then(function (res) {
+      return res.page;
     });
   },
 
   updatePage: function (path, page) {
-    return put(PAGE, path, { page: page });
+    return put(PAGE, path, {
+      page: {
+        meta: JSON.stringify(page.metadata),
+        content: page.content,
+      },
+    }).then(function (res) {
+      return res.page;
+    });
   },
 
   destroy: function (path) {
