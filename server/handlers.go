@@ -300,8 +300,8 @@ func handleReadConfig(w http.ResponseWriter, req *http.Request) {
 func handleUpdateConfig(w http.ResponseWriter, req *http.Request) {
 
 	// parse the config
-	config := rangolib.Frontmatter{}
-	err := json.Unmarshal([]byte(req.FormValue("config")), &config)
+	config := &rangolib.Frontmatter{}
+	err := json.Unmarshal([]byte(req.FormValue("config")), config)
 	if err != nil {
 		errInvalidJson.Write(w)
 		return
