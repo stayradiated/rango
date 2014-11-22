@@ -11,16 +11,7 @@ var InputText = React.createClass({
   propTypes: {
     label: React.PropTypes.string.isRequired,
     value: React.PropTypes.string.isRequired,
-  },
-
-  getInitialState: function (props) {
-    return {
-      value: (props || this.props).value,
-    };
-  },
-
-  componentWillReceiveProps: function (nextProps) {
-    this.setState(this.getInitialState(nextProps));
+    onChange: React.PropTypes.func,
   },
 
   render: function () {
@@ -30,20 +21,11 @@ var InputText = React.createClass({
         <input
           type='text'
           ref='input'
-          value={this.state.value}
-          onChange={this.onChange}
+          value={this.props.value}
+          onChange={this.props.onChange}
         />
       </div>
     );
-  },
-
-  onChange: function (e) {
-    var el = this.refs.input.getDOMNode();
-    var value = el.value;
-
-    this.setState({
-      value: value,
-    });
   },
 
 });

@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('lodash');
-var Constants = require('./constants');
 
 _.extend(exports, {
   open: {
@@ -13,6 +12,11 @@ _.extend(exports, {
   create: {
     page: dispatch('CREATE_PAGE'),
     directory: dispatch('CREATE_DIRECTORY'),
+  },
+  update: {
+    page: dispatch('UPDATE_PAGE'),
+    content: dispatch('UPDATE_CONTENT'),
+    metadata: dispatch('UPDATE_METADATA'),
   },
   select: {
     file: dispatch('SELECT_FILE'),
@@ -29,8 +33,8 @@ _.extend(exports, {
   },
 });
 
-function dispatch (constant) {
+function dispatch (event) {
   return function (args) {
-    this.dispatch(Constants[constant], args);
+    this.dispatch(event, args);
   };
 }

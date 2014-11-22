@@ -5,7 +5,6 @@ var Fluxxor   = require('fluxxor');
 var Path      = require('path')
 var jQuery    = require('jquery');
 
-var Constants = require('../constants');
 var Rango     = require('../api');
 
 var BrowserStore = Fluxxor.createStore({
@@ -119,9 +118,6 @@ var BrowserStore = Fluxxor.createStore({
       },
       content: ''
     }).then(function (res) {
-      if (res.success !== true) {
-        throw new Error('Could not create directory');
-      }
       self.fetchContents();
     });
   },
@@ -149,10 +145,14 @@ var BrowserStore = Fluxxor.createStore({
     }
 
     var self = this;
-    var path = this.getPath();
 
     var deferreds = this.state.get('selected').map(function (file) {
-      return Rango.destroy(file.get('path'));
+      var path = file.get('path');
+      if (file.get('isDir')) {
+        return Rango.deleteDir(path);
+      } else {
+        return Rango.deletePage(path);
+      }
     }).toArray();
 
     jQuery.when.apply(jQuery, deferreds).done(function () {

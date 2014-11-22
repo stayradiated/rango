@@ -1,6 +1,8 @@
 'use strict';
 
 var React           = require('react');
+var Fluxxor         = require('fluxxor');
+var FluxMixin       = Fluxxor.FluxMixin(React);
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 var CodeMirror      = require('react-code-mirror');
 var Marked          = require('marked');
@@ -10,25 +12,16 @@ require('codemirror/mode/markdown/markdown');
 
 var EditorContent = React.createClass({
   mixins: [
+    FluxMixin,
     PureRenderMixin
   ],
 
   propTypes: {
-    page: React.PropTypes.object.isRequired,
-  },
-
-  getInitialState: function (props) {
-    return {
-      content: (props || this.props).page.get('content'),
-    };
-  },
-
-  componentWillReceiveProps: function (nextProps) {
-    this.setState(this.getInitialState(nextProps));
+    content: React.PropTypes.string.isRequired,
   },
 
   render: function () {
-    var markdown = Marked(this.state.content);
+    // var markdown = Marked(this.props.content);
 
     // <div
     //   className='editor-preview'
@@ -39,7 +32,7 @@ var EditorContent = React.createClass({
       <div className='editor-content'>
         <CodeMirror
           className='editor-code'
-          value={this.state.content}
+          value={this.props.content}
           mode='markdown'
           theme='base16-solarized'
           lineNumbers={false}
@@ -51,9 +44,8 @@ var EditorContent = React.createClass({
   },
 
   onChange: function (e) {
-    this.setState({
-      content: e.target.value
-    });
+    var value = e.target.value;
+    this.getFlux().actions.update.content(value);
   },
 
 });

@@ -22,7 +22,10 @@ var BrowserRow = React.createClass({
 
   render: function () {
     var item = this.props.item;
-    var lastModified = moment(item.get('modified_at')).format('LT ll');
+    var lastModified = moment(item.get('modTime') * 1000).format('LT ll');
+    var isDir = item.get('isDir');
+
+    var icon = isDir ? '📁' : '📄';
 
     var classes = classSet({
       selected: this.props.selected,
@@ -34,7 +37,7 @@ var BrowserRow = React.createClass({
         onClick={this.onClick}
         onDoubleClick={this.onDoubleClick}
       >
-        <td className='type'>📄</td>
+        <td className='type'>{icon}</td>
         <td className='name'>{item.get('name')}</td>
         <td className='last-modified'>{lastModified}</td>
         <td className='contents'></td>
@@ -49,7 +52,13 @@ var BrowserRow = React.createClass({
   },
 
   onDoubleClick: function () {
-    this.getFlux().actions.open.page(this.props.item.get('path'));
+    var actions = this.getFlux().actions;
+
+    if (this.props.item.get('isDir')) {
+      actions.open.path(this.props.item.get('path'));
+    } else {
+      actions.open.page(this.props.item.get('path'));
+    }
   },
 
 });

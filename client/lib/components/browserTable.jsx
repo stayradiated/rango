@@ -5,9 +5,7 @@ var Fluxxor         = require('fluxxor');
 var FluxMixin       = Fluxxor.FluxMixin(React);
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
 
-var Constants        = require('../constants');
-var BrowserDirectory = require('./browserDirectory');
-var BrowserFile      = require('./browserFile');
+var BrowserRow = require('./browserRow');
 
 var BrowserTable = React.createClass({
   mixins: [
@@ -24,12 +22,10 @@ var BrowserTable = React.createClass({
     var selected = this.props.browser.get('selected');
 
     var rows = contents.toArray().map(function (item) {
-      var Type = item.get('isDir') ? BrowserDirectory : BrowserFile;
-
       return (
-        <Type
-          key={item.get('name')}
+        <BrowserRow
           item={item}
+          key={item.get('name')}
           selected={selected.contains(item)}
         />
       );

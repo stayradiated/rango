@@ -8,7 +8,6 @@ var StoreWatchMixin = Fluxxor.StoreWatchMixin;
 var Header    = require('./header');
 var Browser   = require('./browser');
 var Editor    = require('./editor');
-var Constants = require('../constants');
 
 var App = React.createClass({
   mixins: [
@@ -29,10 +28,10 @@ var App = React.createClass({
     var view = null;
 
     switch (this.state.app.get('route')) {
-      case Constants.ROUTE_BROWSER:
+      case 'ROUTE_BROWSER':
         view = <Browser browser={this.state.browser} />
         break;
-      case Constants.ROUTE_EDITOR:
+      case 'ROUTE_EDITOR':
         view = <Editor editor={this.state.editor} />
         break;
     }

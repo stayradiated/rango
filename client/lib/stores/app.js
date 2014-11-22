@@ -4,8 +4,6 @@ var jQuery    = require('jquery');
 var Fluxxor   = require('fluxxor');
 var Immutable = require('immutable');
 
-var Constants = require('../constants');
-
 var AppStore = Fluxxor.createStore({
 
   actions: {
@@ -16,17 +14,17 @@ var AppStore = Fluxxor.createStore({
 
   initialize: function () {
     this.state = Immutable.fromJS({
-      route: Constants.ROUTE_BROWSER,
+      route: 'ROUTE_BROWSER',
     });
   },
 
   handleOpenBrowser: function () {
-    this.state = this.state.set('route', Constants.ROUTE_BROWSER);
+    this.state = this.state.set('route', 'ROUTE_BROWSER');
     this.emit('change');
   },
 
   handleOpenEditor: function () {
-    this.state = this.state.set('route', Constants.ROUTE_EDITOR);
+    this.state = this.state.set('route', 'ROUTE_EDITOR');
     this.emit('change');
   },
 

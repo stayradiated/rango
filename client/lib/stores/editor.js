@@ -3,7 +3,6 @@
 var Immutable = require('immutable');
 var Fluxxor   = require('fluxxor');
 
-var Constants = require('../constants');
 var Rango     = require('../api');
 
 var emptyPage = Immutable.fromJS({
@@ -16,6 +15,8 @@ var EditorStore = Fluxxor.createStore({
   actions: {
     OPEN_PAGE: 'handleOpenPage',
     SAVE_PAGE: 'handleSavePage',
+    UPDATE_METADATA: 'handleUpdateMetadata',
+    UPDATE_CONTENT: 'handleUpdateContent',
   },
 
   initialize: function () {
@@ -68,6 +69,16 @@ var EditorStore = Fluxxor.createStore({
       })
       self.emit('change');
     })
+  },
+
+  handleUpdateMetadata: function (metadata) {
+    this.state = this.state.setIn(['page', 'metadata'], metadata);
+    this.emit('change')
+  },
+
+  handleUpdateContent: function (content) {
+    this.state = this.state.setIn(['page', 'content'], content);
+    this.emit('change');
   },
 
 });

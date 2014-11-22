@@ -3,7 +3,6 @@
 var Immutable = require('immutable');
 var Fluxxor   = require('fluxxor');
 
-var Constants = require('../constants');
 var Rango     = require('../api');
 
 var ConfigStore = Fluxxor.createStore({

@@ -38,7 +38,7 @@ _.extend(exports, {
   },
 
   deleteDir: function (path) {
-    return del(path);
+    return del(DIR, path);
   },
 
 
@@ -72,8 +72,8 @@ _.extend(exports, {
     });
   },
 
-  destroy: function (path) {
-    return del(path);
+  deletePage: function (path) {
+    return del(PAGE, path);
   },
 
   
@@ -128,10 +128,10 @@ function put (method, path, params) {
   });
 }
 
-function del (path) {
+function del (method, path) {
   return jQuery.ajax({
     type: 'delete',
-    url: Path.join(BASE_URL, path),
+    url: Path.join(BASE_URL, method, path),
     dataType: 'json',
   });
 }

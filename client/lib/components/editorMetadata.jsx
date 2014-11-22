@@ -2,6 +2,8 @@
 
 var React           = require('react');
 var PureRenderMixin = require('react/addons').addons.PureRenderMixin;
+var Fluxxor         = require('fluxxor');
+var FluxMixin       = Fluxxor.FluxMixin(React);
 
 var InputText     = require('./inputText');
 var InputTextarea = require('./inputTextarea');
@@ -9,15 +11,16 @@ var InputCheckbox = require('./inputCheckbox');
 
 var EditorMetadata = React.createClass({
   mixins: [
+    FluxMixin,
     PureRenderMixin,
   ],
 
   propTypes: {
-    page: React.PropTypes.object.isRequired,
+    metadata: React.PropTypes.object.isRequired,
   },
 
   render: function () {
-    var meta = this.props.page.get('metadata');
+    var meta = this.props.metadata;
 
     var data = {
       title: meta.get('title', ''),
@@ -33,7 +36,12 @@ var EditorMetadata = React.createClass({
     var inputs = [];
     for (var key in data) {
       inputs.push(
-        <InputText key={key} label={key} value={data[key]} />
+        <InputText
+          key={key}
+          label={key}
+          value={data[key]}
+          onChange={this.onChange.bind(this, key)}
+        />
       );
     }
 
@@ -44,6 +52,12 @@ var EditorMetadata = React.createClass({
         <InputCheckbox label='Draft' />
       </div>
     );
+  },
+
+  onChange: function (key, e) {
+    var value = e.target.value;
+    var meta = this.props.metadata.set(key, value);
+    this.getFlux().actions.update.metadata(meta);
   },
 
 });
