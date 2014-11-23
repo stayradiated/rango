@@ -48,7 +48,7 @@ gulp.task('lib', function () {
         console.log(err.message);
       })
       .pipe(source('main.js'))
-      .pipe(gulp.dest('./dist/js'))
+      .pipe(gulp.dest('./dist'))
       .pipe(browserSync.reload({stream: true}));
   }
 
@@ -59,12 +59,12 @@ gulp.task('style', function () {
   return gulp.src('./style/main.scss')
     .pipe(sass({errLogToConsole: true, outputStyle: 'compressed'}))
     .pipe(autoprefixer())
-    .pipe(gulp.dest('./dist/css'))
+    .pipe(gulp.dest('./dist'))
     .pipe(browserSync.reload({stream: true}));
 });
 
 gulp.task('minify', function () {
-  return gulp.src('./dist/js/*')
+  return gulp.src('./dist/*.js')
     .pipe(uglify())
-    .pipe(gulp.dest('./dist/js'));
+    .pipe(gulp.dest('./dist'));
 });

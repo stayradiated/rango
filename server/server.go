@@ -16,7 +16,7 @@ func Start() *negroni.Negroni {
 	n := negroni.New()
 	n.Use(negroni.NewRecovery())
 	n.Use(negroni.NewLogger())
-	n.Use(negroni.NewStatic(http.Dir("./client/dist/")))
+	n.Use(negroni.NewStatic(http.Dir("./admin/dist")))
 	n.Use(negroni.HandlerFunc(respondWithJson))
 
 	// listen to handlers
@@ -46,6 +46,9 @@ func Handlers() *mux.Router {
 	// config
 	api.HandleFunc("/config", handleReadConfig).Methods("GET")
 	api.HandleFunc("/config", handleUpdateConfig).Methods("PUT")
+
+	// hugo
+	api.HandleFunc("/site/publish", handlePublishSite).Methods("POST")
 
 	// files
 	api.HandleFunc("/copy/{path:.*}", handleCopy).Methods("POST")

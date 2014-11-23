@@ -36,7 +36,7 @@ var Header = React.createClass({
             onClick={this.onClickSaveBtn}>Save Page</button>
           <button
             className='button button-primary'
-            Click={this.onClickPublishBtn}>Publish Site</button>
+            onClick={this.onClickPublishBtn}>Publish Site</button>
         </div>
       </header>
     );

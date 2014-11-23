@@ -88,6 +88,15 @@ _.extend(exports, {
   },
 
 
+  // Site
+  
+  publishSite: function () {
+    return post('site', 'publish').then(function (res) {
+      return res.output;
+    });
+  },
+
+
   // Files
 
   copy: function (src, dst) {

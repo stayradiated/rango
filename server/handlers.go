@@ -317,6 +317,23 @@ func handleUpdateConfig(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+//  ┬ ┬┬ ┬┌─┐┌─┐
+//  ├─┤│ ││ ┬│ │
+//  ┴ ┴└─┘└─┘└─┘
+
+func handlePublishSite(w http.ResponseWriter, req *http.Request) {
+	output, err := rangolib.RunHugo()
+	if err != nil {
+		wrapError(err).Write(w)
+	}
+
+	printJson(w, struct {
+		Output string `json:"output"`
+	}{
+		Output: string(output),
+	})
+}
+
 //  ┌─┐┬┬  ┌─┐┌─┐
 //  ├┤ ││  ├┤ └─┐
 //  └  ┴┴─┘└─┘└─┘

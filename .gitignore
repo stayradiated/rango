@@ -8,8 +8,8 @@ _obj
 _test
 node_modules
 
-/client/dist/css/*.css
-/client/dist/js/*.js
+/admin/dist/*.css
+/admin/dist/*.js
 
 # Architecture specific extensions/prefixes
 *.[568vq]
