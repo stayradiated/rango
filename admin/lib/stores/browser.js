@@ -16,6 +16,8 @@ var BrowserStore = Fluxxor.createStore({
     CREATE_PAGE:            'handleCreatePage',
     CREATE_DIRECTORY:       'handleCreateDirectory',
 
+    UPDATE_DIRECTORY:       'handleUpdateDirectory',
+
     OPEN_PARENT_DIRECTORY:  'handleOpenParentDirectory',
     SELECT_FILE:            'handleSelectFile',
     DESELECT_ALL:           'handleDeselectAll',
@@ -117,6 +119,24 @@ var BrowserStore = Fluxxor.createStore({
         title: name,
       },
       content: ''
+    }).then(function (res) {
+      self.fetchContents();
+    });
+  },
+
+  // rename a directory
+  handleUpdateDirectory: function () {
+    var selectedDir = this.state.get('selected').first();
+    if (! selectedDir) { return; }
+
+    var name = window.prompt('Enter a new name for this directory');
+    if (! name) { return; }
+
+    var self = this;
+    var path = selectedDir.get('path');
+
+    Rango.updateDir(path, {
+      name: name,
     }).then(function (res) {
       self.fetchContents();
     });

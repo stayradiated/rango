@@ -51,7 +51,7 @@ func ReadDir(dirname string) ([]*File, error) {
 func CreateDir(dirname string) (*File, error) {
 
 	// make directory
-	if err := os.MkdirAll(dirname, 0755); err != nil {
+	if err := os.Mkdir(dirname, 0755); err != nil {
 		return nil, err
 	}
 

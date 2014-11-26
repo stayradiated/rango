@@ -12,6 +12,8 @@ var Header = React.createClass({
   ],
   
   propTypes: {
+    app: React.PropTypes.object.isRequired,
+    editor: React.PropTypes.object.isRequired,
     browser: React.PropTypes.object.isRequired,
   },
 
@@ -33,6 +35,10 @@ var Header = React.createClass({
         <div className='button-group'>
           <button
             className='button'
+            disabled={
+              this.props.app.get('route') === 'BROWSER'
+              || this.props.editor.get('hasChanged') === false
+            }
             onClick={this.onClickSaveBtn}>Save Page</button>
           <button
             className='button button-primary'

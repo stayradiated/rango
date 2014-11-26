@@ -21,12 +21,12 @@ var BrowserSidebar = React.createClass({
     return (
       <div className='browser-sidebar'>
         <ul>
-          <li onClick={this.createFolder}>Create Folder</li>
+          <li onClick={this.createDirectory}>Create Folder</li>
           <li onClick={this.createPage}>Create Page</li>
           <hr />
           {
             selected === 1 ? (
-              <li>Rename Selected Folder</li>
+              <li onClick={this.renameDirectory}>Rename Selected Folder</li>
             ) : null
           }
           {
@@ -39,8 +39,12 @@ var BrowserSidebar = React.createClass({
     );
   },
 
-  createFolder: function () {
+  createDirectory: function () {
     this.getFlux().actions.create.directory();
+  },
+
+  renameDirectory: function () {
+    this.getFlux().actions.update.directory();
   },
 
   createPage: function () {

@@ -17,17 +17,17 @@ var AppStore = Fluxxor.createStore({
 
   initialize: function () {
     this.state = Immutable.fromJS({
-      route: 'ROUTE_BROWSER',
+      route: 'BROWSER',
     });
   },
 
   handleOpenBrowser: function () {
-    this.state = this.state.set('route', 'ROUTE_BROWSER');
+    this.state = this.state.set('route', 'BROWSER');
     this.emit('change');
   },
 
   handleOpenEditor: function () {
-    this.state = this.state.set('route', 'ROUTE_EDITOR');
+    this.state = this.state.set('route', 'EDITOR');
     this.emit('change');
   },
 

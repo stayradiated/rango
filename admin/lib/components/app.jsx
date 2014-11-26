@@ -28,17 +28,21 @@ var App = React.createClass({
     var view = null;
 
     switch (this.state.app.get('route')) {
-      case 'ROUTE_BROWSER':
+      case 'BROWSER':
         view = <Browser browser={this.state.browser} />
         break;
-      case 'ROUTE_EDITOR':
+      case 'EDITOR':
         view = <Editor editor={this.state.editor} />
         break;
     }
 
     return (
       <div className='app'>
-        <Header browser={this.state.browser} />
+        <Header
+          app={this.state.app}
+          editor={this.state.editor}
+          browser={this.state.browser}
+        />
         {view}
       </div>
     );

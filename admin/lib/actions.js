@@ -17,6 +17,7 @@ _.extend(exports, {
     page: dispatch('UPDATE_PAGE'),
     content: dispatch('UPDATE_CONTENT'),
     metadata: dispatch('UPDATE_METADATA'),
+    directory: dispatch('UPDATE_DIRECTORY'),
   },
   select: {
     file: dispatch('SELECT_FILE'),

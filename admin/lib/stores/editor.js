@@ -29,6 +29,9 @@ var EditorStore = Fluxxor.createStore({
       // the directories and pages in the current path
       page: emptyPage,
 
+      // if the page has changed since it was last loaded
+      hasChanged: false,
+
     });
   },
 
@@ -42,6 +45,7 @@ var EditorStore = Fluxxor.createStore({
 
     Rango.readPage(this.state.get('path')).then(function (page) {
       self.state = self.state.set('page', Immutable.fromJS(page));
+      self.state = self.state.set('hasChanged', false);
       self.emit('change');
     });
   },
@@ -62,6 +66,7 @@ var EditorStore = Fluxxor.createStore({
     ).then(function (page) {
       self.state = Immutable.fromJS({
         path: page.path,
+        hasChanged: false,
         page: {
           content: page.content,
           metadata: page.metadata,
@@ -73,11 +78,13 @@ var EditorStore = Fluxxor.createStore({
 
   handleUpdateMetadata: function (metadata) {
     this.state = this.state.setIn(['page', 'metadata'], metadata);
+    this.state = this.state.set('hasChanged', true);
     this.emit('change')
   },
 
   handleUpdateContent: function (content) {
     this.state = this.state.setIn(['page', 'content'], content);
+    this.state = this.state.set('hasChanged', true);
     this.emit('change');
   },
 

@@ -16,6 +16,8 @@ gulp.task('default', ['lib', 'style'], function () {
 
 gulp.task('server', ['default'], function () {
   return browserSync({
+    notify: false,
+    ghostMode: false,
     server: {
       baseDir: './dist/',
     }
@@ -24,6 +26,9 @@ gulp.task('server', ['default'], function () {
 
 gulp.task('proxy', ['default'], function () {
   return browserSync({
+    notify: false,
+    open: false,
+    ghostMode: false,
     proxy: 'localhost:8080',
   });
 });

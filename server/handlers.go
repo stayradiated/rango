@@ -56,7 +56,7 @@ func handleCreateDir(w http.ResponseWriter, req *http.Request) {
 
 	// combine parent and dirname
 	parent := mux.Vars(req)["path"]
-	dirname := req.FormValue("dir[name]")
+	dirname := sanitize.Path(req.FormValue("dir[name]"))
 	fp := filepath.Join(parent, dirname)
 
 	// check that it is a valid path
