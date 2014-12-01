@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"io"
+	"net/http"
 	"os"
 	"path"
 	"strings"
@@ -44,10 +44,11 @@ func convertPath(p string) (string, error) {
 	return fp, nil
 }
 
-func printError(w io.Writer, err interface{}) {
+func printError(w http.ResponseWriter, err interface{}) {
 	printJson(w, err)
 }
 
-func printJson(w io.Writer, obj interface{}) {
+func printJson(w http.ResponseWriter, obj interface{}) {
+	w.Headers().Set("Content-Type", "application/json; charset=UTF-8")
 	json.NewEncoder(w).Encode(obj)
 }

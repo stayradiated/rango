@@ -1,30 +1,6 @@
-package server
+package main
 
-import (
-	"net/http"
-
-	"github.com/codegangsta/negroni"
-	"github.com/gorilla/mux"
-)
-
-var contentDir = "content"
-
-// main starts the web server
-func Start() *negroni.Negroni {
-
-	// setup middleware
-	n := negroni.New()
-	n.Use(negroni.NewRecovery())
-	n.Use(negroni.NewLogger())
-	n.Use(negroni.NewStatic(http.Dir("./admin/dist")))
-	n.Use(negroni.HandlerFunc(respondWithJson))
-
-	// listen to handlers
-	n.UseHandler(Handlers())
-
-	// return negroni
-	return n
-}
+import "github.com/gorilla/mux"
 
 // Handlers connects the handlers to a new router
 func Handlers() *mux.Router {
@@ -54,10 +30,4 @@ func Handlers() *mux.Router {
 	api.HandleFunc("/copy/{path:.*}", handleCopy).Methods("POST")
 
 	return r
-}
-
-// respondWithJson sets the content-type header to application/json
-func respondWithJson(w http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	w.Header().Set("Content-Type", "application/json")
-	next(w, req)
 }

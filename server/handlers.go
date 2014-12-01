@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"encoding/json"
@@ -16,21 +16,21 @@ import (
 //   │││├┬┘├┤ │   │ │ │├┬┘│├┤ └─┐
 //  ─┴┘┴┴└─└─┘└─┘ ┴ └─┘┴└─┴└─┘└─┘
 
-type handleReadDirResponse struct {
+type readDirResponse struct {
 	Data []*rangolib.File `json:"data"`
 }
 
-type handleCreateDirResponse struct {
+type createDirResponse struct {
 	Dir *rangolib.File `json:"dir"`
 }
 
-type handleUpdateDirResponse struct {
+type updateDirResponse struct {
 	Dir *rangolib.File `json:"dir"`
 }
 
-// handleReadDir reads contents of a directory
-func handleReadDir(w http.ResponseWriter, req *http.Request) {
-	fp, err := convertPath(mux.Vars(req)["path"])
+// readDir reads contents of a directory
+func readDir(w http.ResponseWriter, r *http.Request) {
+	fp, err := convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -48,15 +48,15 @@ func handleReadDir(w http.ResponseWriter, req *http.Request) {
 		item.Path = strings.TrimPrefix(item.Path, contentDir)
 	}
 
-	printJson(w, &handleReadDirResponse{Data: contents})
+	printJson(w, &readDirResponse{Data: contents})
 }
 
-// handleCreateDir creates a directory
-func handleCreateDir(w http.ResponseWriter, req *http.Request) {
+// createDir creates a directory
+func createDir(w http.ResponseWriter, r *http.Request) {
 
 	// combine parent and dirname
-	parent := mux.Vars(req)["path"]
-	dirname := sanitize.Path(req.FormValue("dir[name]"))
+	parent := mux.Vars(r)["path"]
+	dirname := sanitize.Path(r.FormValue("dir[name]"))
 	fp := filepath.Join(parent, dirname)
 
 	// check that it is a valid path
@@ -83,12 +83,12 @@ func handleCreateDir(w http.ResponseWriter, req *http.Request) {
 	dir.Path = strings.TrimPrefix(dir.Path, contentDir)
 
 	// print info
-	printJson(w, &handleCreateDirResponse{Dir: dir})
+	printJson(w, &createDirResponse{Dir: dir})
 }
 
-// handleUpdateDir renames a directory
-func handleUpdateDir(w http.ResponseWriter, req *http.Request) {
-	fp, err := convertPath(mux.Vars(req)["path"])
+// updateDir renames a directory
+func updateDir(w http.ResponseWriter, r *http.Request) {
+	fp, err := convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -108,7 +108,7 @@ func handleUpdateDir(w http.ResponseWriter, req *http.Request) {
 
 	// combine parent dir with dir name
 	parent := filepath.Dir(fp)
-	dirname := sanitize.Path(req.FormValue("dir[name]"))
+	dirname := sanitize.Path(r.FormValue("dir[name]"))
 	dest := filepath.Join(parent, dirname)
 
 	// rename directory
@@ -119,12 +119,12 @@ func handleUpdateDir(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// print info
-	printJson(w, &handleUpdateDirResponse{Dir: dir})
+	printJson(w, &updateDirResponse{Dir: dir})
 }
 
-// handleDeleteDir deletes a directory
-func handleDeleteDir(w http.ResponseWriter, req *http.Request) {
-	fp, err := convertPath(mux.Vars(req)["path"])
+// deleteDir deletes a directory
+func deleteDir(w http.ResponseWriter, r *http.Request) {
+	fp, err := convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -149,21 +149,21 @@ func handleDeleteDir(w http.ResponseWriter, req *http.Request) {
 //  ├─┘├─┤│ ┬├┤ └─┐
 //  ┴  ┴ ┴└─┘└─┘└─┘
 
-type handleReadPageResponse struct {
+type readPageResponse struct {
 	Page *rangolib.Page `json:"page"`
 }
 
-type handleCreatePageResponse struct {
+type createPageResponse struct {
 	Page *rangolib.Page `json:"page"`
 }
 
-type handleUpdatePageResponse struct {
+type updatePageResponse struct {
 	Page *rangolib.Page `json:"page"`
 }
 
-// handleReadPage reads page data
-func handleReadPage(w http.ResponseWriter, req *http.Request) {
-	fp, err := convertPath(mux.Vars(req)["path"])
+// readPage reads page data
+func readPage(w http.ResponseWriter, r *http.Request) {
+	fp, err := convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -180,12 +180,12 @@ func handleReadPage(w http.ResponseWriter, req *http.Request) {
 	page.Path = strings.TrimPrefix(page.Path, contentDir)
 
 	// print json
-	printJson(w, &handleReadPageResponse{Page: page})
+	printJson(w, &readPageResponse{Page: page})
 }
 
-// handleCreatePage creates a new page
-func handleCreatePage(w http.ResponseWriter, req *http.Request) {
-	fp, err := convertPath(mux.Vars(req)["path"])
+// createPage creates a new page
+func createPage(w http.ResponseWriter, r *http.Request) {
+	fp, err := convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -197,7 +197,7 @@ func handleCreatePage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	metastring := req.FormValue("page[meta]")
+	metastring := r.FormValue("page[meta]")
 	if len(metastring) == 0 {
 		errNoMeta.Write(w)
 	}
@@ -209,7 +209,7 @@ func handleCreatePage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	content := []byte(req.FormValue("page[content]"))
+	content := []byte(r.FormValue("page[content]"))
 
 	page, err := rangolib.CreatePage(fp, metadata, content)
 	if err != nil {
@@ -220,12 +220,12 @@ func handleCreatePage(w http.ResponseWriter, req *http.Request) {
 	// trim content prefix from path
 	page.Path = strings.TrimPrefix(page.Path, contentDir)
 
-	printJson(w, &handleCreatePageResponse{Page: page})
+	printJson(w, &createPageResponse{Page: page})
 }
 
-// handleUpdatePage writes page data to a file
-func handleUpdatePage(w http.ResponseWriter, req *http.Request) {
-	fp, err := convertPath(mux.Vars(req)["path"])
+// updatePage writes page data to a file
+func updatePage(w http.ResponseWriter, r *http.Request) {
+	fp, err := convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -237,7 +237,7 @@ func handleUpdatePage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	metastring := req.FormValue("page[meta]")
+	metastring := r.FormValue("page[meta]")
 	if len(metastring) == 0 {
 		errNoMeta.Write(w)
 	}
@@ -249,7 +249,7 @@ func handleUpdatePage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	content := []byte(req.FormValue("page[content]"))
+	content := []byte(r.FormValue("page[content]"))
 
 	page, err := rangolib.UpdatePage(fp, metadata, content)
 	if err != nil {
@@ -260,12 +260,12 @@ func handleUpdatePage(w http.ResponseWriter, req *http.Request) {
 	// trim content prefix from path
 	page.Path = strings.TrimPrefix(page.Path, contentDir)
 
-	printJson(w, &handleUpdatePageResponse{Page: page})
+	printJson(w, &updatePageResponse{Page: page})
 }
 
-// handleDeletePage deletes a page
-func handleDeletePage(w http.ResponseWriter, req *http.Request) {
-	fp, err := convertPath(mux.Vars(req)["path"])
+// deletePage deletes a page
+func deletePage(w http.ResponseWriter, r *http.Request) {
+	fp, err := convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -285,8 +285,8 @@ func handleDeletePage(w http.ResponseWriter, req *http.Request) {
 //  │  │ ││││├┤ ││ ┬
 //  └─┘└─┘┘└┘└  ┴└─┘
 
-// handleReadConfig reads data from a config
-func handleReadConfig(w http.ResponseWriter, req *http.Request) {
+// readConfig reads data from a config
+func readConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := rangolib.ReadConfig()
 	if err != nil {
 		errNoConfig.Write(w)
@@ -296,12 +296,12 @@ func handleReadConfig(w http.ResponseWriter, req *http.Request) {
 	printJson(w, config)
 }
 
-// handleUpdateConfig writes json data to a config file
-func handleUpdateConfig(w http.ResponseWriter, req *http.Request) {
+// updateConfig writes json data to a config file
+func updateConfig(w http.ResponseWriter, r *http.Request) {
 
 	// parse the config
 	config := &rangolib.Frontmatter{}
-	err := json.Unmarshal([]byte(req.FormValue("config")), config)
+	err := json.Unmarshal([]byte(r.FormValue("config")), config)
 	if err != nil {
 		errInvalidJson.Write(w)
 		return
@@ -321,7 +321,7 @@ func handleUpdateConfig(w http.ResponseWriter, req *http.Request) {
 //  ├─┤│ ││ ┬│ │
 //  ┴ ┴└─┘└─┘└─┘
 
-func handlePublishSite(w http.ResponseWriter, req *http.Request) {
+func publishSite(w http.ResponseWriter, r *http.Request) {
 	output, err := rangolib.RunHugo()
 	if err != nil {
 		wrapError(err).Write(w)
@@ -338,10 +338,10 @@ func handlePublishSite(w http.ResponseWriter, req *http.Request) {
 //  ├┤ ││  ├┤ └─┐
 //  └  ┴┴─┘└─┘└─┘
 
-// handleCopy copies a page to a new file
-func handleCopy(w http.ResponseWriter, req *http.Request) {
-	location := req.Header.Get("Content-Location")
-	vars := mux.Vars(req)
+// copy copies a page to a new file
+func copy(w http.ResponseWriter, r *http.Request) {
+	location := r.Header.Get("Content-Location")
+	vars := mux.Vars(r)
 	if len(location) > 0 {
 		fmt.Fprint(w, "Moving file from "+location+" to "+vars["path"])
 	}
