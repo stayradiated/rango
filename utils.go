@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"encoding/json"
@@ -49,6 +49,6 @@ func printError(w http.ResponseWriter, err interface{}) {
 }
 
 func printJson(w http.ResponseWriter, obj interface{}) {
-	w.Headers().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	json.NewEncoder(w).Encode(obj)
 }

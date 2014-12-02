@@ -122,8 +122,8 @@ func updateDir(w http.ResponseWriter, r *http.Request) {
 	printJson(w, &updateDirResponse{Dir: dir})
 }
 
-// deleteDir deletes a directory
-func deleteDir(w http.ResponseWriter, r *http.Request) {
+// destroyDir deletes a directory
+func destroyDir(w http.ResponseWriter, r *http.Request) {
 	fp, err := convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		errInvalidDir.Write(w)
@@ -263,8 +263,8 @@ func updatePage(w http.ResponseWriter, r *http.Request) {
 	printJson(w, &updatePageResponse{Page: page})
 }
 
-// deletePage deletes a page
-func deletePage(w http.ResponseWriter, r *http.Request) {
+// destroyPage deletes a page
+func destroyPage(w http.ResponseWriter, r *http.Request) {
 	fp, err := convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)

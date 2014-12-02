@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"log"
@@ -13,11 +13,11 @@ func Logger(inner http.Handler, name string) http.Handler {
 		inner.ServeHTTP(w, r)
 
 		log.Printf(
-			"%s\t%s\t%s\t%s",
-			r.Method,
-			r.RequestURI,
-			name,
+			"%12s\t%6s\t%12s\t%s",
 			time.Since(start),
+			r.Method,
+			name,
+			r.RequestURI,
 		)
 	})
 }

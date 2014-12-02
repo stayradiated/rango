@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"net/http"
@@ -7,7 +7,9 @@ import (
 )
 
 func NewRouter() *mux.Router {
-	router := mux.NewRouter().StrictSlash(true)
+	router := mux.NewRouter()
+
+	// load routes
 	for _, route := range routes {
 		var handler http.Handler
 
@@ -20,6 +22,8 @@ func NewRouter() *mux.Router {
 			Name(route.Name).
 			Handler(handler)
 	}
+
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./admin/dist")))
 
 	return router
 }
