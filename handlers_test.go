@@ -5,11 +5,10 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
-	"github.com/stayradiated/afero"
-	"github.com/stayradiated/rango/rangofs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,12 +19,11 @@ var (
 )
 
 func init() {
-	contentDir = "content"
-	rangofs.Fs = new(afero.MemMapFs)
+	contentDir = "test_content"
 
-	rangofs.Fs.Mkdir("content", 0755)
+	os.Mkdir("test_content", 0755)
 
-	server = httptest.NewServer(Start())
+	server = httptest.NewServer(NewRouter())
 	dirUrl = fmt.Sprintf("%s/api/dir", server.URL)
 }
 
@@ -35,7 +33,7 @@ func TestReadDir(t *testing.T) {
 	url := dirUrl + "/"
 	reader = strings.NewReader("")
 
-	req, _ := http.NewRequest("POST", url, reader)
+	req, _ := http.NewRequest("GET", url, reader)
 	res, err := http.DefaultClient.Do(req)
 	assert.Nil(err)
 

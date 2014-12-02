@@ -91,8 +91,8 @@ func (assert *DirTestSuite) TestCreateDirWithExistingDir() {
 	os.Mkdir("content/foo", 0755)
 
 	dir, err := CreateDir("content/foo")
-	assert.Nil(err)
-	assert.NotNil(dir)
+	assert.NotNil(err)
+	assert.Nil(dir)
 }
 
 // test updatedir on an existing directory with contents
