@@ -24,10 +24,14 @@ type HandlersTestSuite struct {
 func (assert *HandlersTestSuite) SetupTest() {
 	os.Mkdir(contentDir, 0755)
 
-	server = httptest.NewServer(NewRouter(&Handlers{
-		Config:     rangolib.NewConfig("config.toml"),
-		Dir:        rangolib.NewDir(),
-		ContentDir: contentDir,
+	server = httptest.NewServer(NewRouter(&RouterConfig{
+		Handlers: &Handlers{
+			Config:     rangolib.NewConfig("config.toml"),
+			Dir:        rangolib.NewDir(),
+			Page:       rangolib.NewPage(),
+			ContentDir: contentDir,
+		},
+		AdminDir: "./admin/dist",
 	}))
 }
 

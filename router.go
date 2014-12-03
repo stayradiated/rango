@@ -6,12 +6,17 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewRouter(handlers *Handlers) *mux.Router {
+type RouterConfig struct {
+	Handlers *Handlers
+	AdminDir string
+}
+
+func NewRouter(config *RouterConfig) *mux.Router {
 	router := mux.NewRouter()
 	apiRouter := router.PathPrefix("/api").Subrouter()
 
 	// load routes
-	for _, route := range GetRoutes(handlers) {
+	for _, route := range GetRoutes(config.Handlers) {
 		var handler http.Handler
 
 		handler = route.HandlerFunc
@@ -24,7 +29,7 @@ func NewRouter(handlers *Handlers) *mux.Router {
 			Handler(handler)
 	}
 
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./admin/dist")))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir(config.AdminDir)))
 
 	return router
 }

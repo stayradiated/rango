@@ -1,3 +1,8 @@
+ContentDir = "content"
+
+# rango
+AdminDir = "./admin/dist"
+
 title = "That is awesome"
 
 [rango]
