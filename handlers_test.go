@@ -1,37 +1,44 @@
 package main
 
 import (
-	"fmt"
-	"io"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stayradiated/rango/rangolib"
+	"github.com/stretchr/testify/suite"
 )
 
 var (
-	server *httptest.Server
-	reader io.Reader
-	dirUrl string
+	server     *httptest.Server
+	contentDir string = "__tmp__"
 )
 
-func init() {
-	contentDir = "test_content"
-
-	os.Mkdir("test_content", 0755)
-
-	server = httptest.NewServer(NewRouter())
-	dirUrl = fmt.Sprintf("%s/api/dir", server.URL)
+type HandlersTestSuite struct {
+	suite.Suite
 }
 
-func TestReadDir(t *testing.T) {
-	assert := assert.New(t)
+func (assert *HandlersTestSuite) SetupTest() {
+	os.Mkdir(contentDir, 0755)
 
-	url := dirUrl + "/"
-	reader = strings.NewReader("")
+	server = httptest.NewServer(NewRouter(&Handlers{
+		Config:     rangolib.NewConfig("config.toml"),
+		Dir:        rangolib.NewDir(),
+		ContentDir: contentDir,
+	}))
+}
+
+func (assert *HandlersTestSuite) TearDownTest() {
+	os.RemoveAll(contentDir)
+	server.Close()
+}
+
+func (assert *HandlersTestSuite) TestReadDir() {
+	url := server.URL + "/api/dir/"
+	reader := strings.NewReader("")
 
 	req, _ := http.NewRequest("GET", url, reader)
 	res, err := http.DefaultClient.Do(req)
@@ -39,11 +46,11 @@ func TestReadDir(t *testing.T) {
 
 	assert.Equal(res.StatusCode, http.StatusOK)
 
-	// body := new(handleReadDirResponse)
-	fmt.Println(res.Body)
+	var body readDirResponse
+	err = json.NewDecoder(res.Body).Decode(&body)
+	assert.Nil(err)
+}
 
-	// err = json.NewDecoder(res.Body).Decode(body)
-	// assert.Nil(err)
-
-	// fmt.Println(body.Data[0])
+func TestHandlers(t *testing.T) {
+	suite.Run(t, new(HandlersTestSuite))
 }

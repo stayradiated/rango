@@ -11,57 +11,58 @@ type Route struct {
 
 type Routes []Route
 
-var routes = Routes{
+func GetRoutes(h *Handlers) Routes {
+	return Routes{
+		// directories
+		Route{
+			"ReadDir",
+			"GET", "/api/dir/{path:.*}", h.ReadDir,
+		},
+		Route{
+			"CreateDir",
+			"POST", "/api/dir/{path:.*}", h.CreateDir,
+		},
+		Route{
+			"UpdateDir",
+			"PUT", "/api/dir/{path:.*}", h.UpdateDir,
+		},
+		Route{
+			"DestroyDir",
+			"DELETE", "/api/dir/{path:.*}", h.DestroyDir,
+		},
 
-	// directories
-	Route{
-		"ReadDir",
-		"GET", "/api/dir/{path:.*}", readDir,
-	},
-	Route{
-		"CreateDir",
-		"POST", "/api/dir/{path:.*}", createDir,
-	},
-	Route{
-		"UpdateDir",
-		"PUT", "/api/dir/{path:.*}", updateDir,
-	},
-	Route{
-		"DestroyDir",
-		"DELETE", "/api/dir/{path:.*}", destroyDir,
-	},
+		// pages
+		Route{
+			"ReadPage",
+			"GET", "/api/page/{path:.*}", h.ReadPage,
+		},
+		Route{
+			"CreatePage",
+			"POST", "/api/page/{path:.*}", h.CreatePage,
+		},
+		Route{
+			"UpdatePage",
+			"PUT", "/api/page/{path:.*}", h.UpdatePage,
+		},
+		Route{
+			"DestroyPage",
+			"DELETE", "/api/page/{path:.*}", h.DestroyPage,
+		},
 
-	// pages
-	Route{
-		"ReadPage",
-		"GET", "/api/page/{path:.*}", readPage,
-	},
-	Route{
-		"CreatePage",
-		"POST", "/api/page/{path:.*}", createPage,
-	},
-	Route{
-		"UpdatePage",
-		"PUT", "/api/page/{path:.*}", updatePage,
-	},
-	Route{
-		"DestroyPage",
-		"DELETE", "/api/page/{path:.*}", destroyPage,
-	},
+		// config
+		Route{
+			"ReadConfig",
+			"GET", "/api/config", h.ReadConfig,
+		},
+		Route{
+			"UpdateConfig",
+			"PUT", "/api/config", h.UpdateConfig,
+		},
 
-	// config
-	Route{
-		"ReadConfig",
-		"GET", "/api/config", readConfig,
-	},
-	Route{
-		"UpdateConfig",
-		"PUT", "/api/config", updateConfig,
-	},
-
-	// misc
-	Route{
-		"PublishSite",
-		"POST", "/site/publish", publishSite,
-	},
+		// misc
+		Route{
+			"PublishSite",
+			"POST", "/site/publish", h.PublishSite,
+		},
+	}
 }

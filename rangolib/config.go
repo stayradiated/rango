@@ -2,25 +2,46 @@ package rangolib
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 
 	"github.com/BurntSushi/toml"
 )
 
-var configPath = "config.toml"
+type ConfigManager interface {
+	Parse() (*ConfigMap, error)
+	Save(config *ConfigMap) error
+}
+type ConfigMap map[string]interface{}
 
-// ReadConfig reads the config from disk
-func ReadConfig() (*Frontmatter, error) {
+type Config struct {
+	path string
+}
 
-	// read data from config file
-	data, err := ioutil.ReadFile(configPath)
+func NewConfig(path string) *Config {
+	return &Config{
+		path: path,
+	}
+}
+
+// Open returns a fd to the config file
+func (c Config) Open() (*os.File, error) {
+	return os.Open(c.path)
+}
+
+// Create empties the config file and returns the fd to it
+func (c Config) Create() (*os.File, error) {
+	return os.Create(c.path)
+}
+
+// Parse converts the config file into a readable map
+func (c Config) Parse() (*ConfigMap, error) {
+	config := &ConfigMap{}
+	file, err := c.Open()
 	if err != nil {
 		return nil, err
 	}
 
-	// decode toml
-	config := &Frontmatter{}
-	_, err = toml.Decode(string(data), config)
+	_, err = toml.DecodeReader(file, config)
 	if err != nil {
 		return nil, err
 	}
@@ -28,8 +49,8 @@ func ReadConfig() (*Frontmatter, error) {
 	return config, nil
 }
 
-// SaveConfig saves the config to disk
-func SaveConfig(config *Frontmatter) error {
+// Save saves the config to disk
+func (c Config) Save(config *ConfigMap) error {
 
 	// convert config into a string
 	buf := new(bytes.Buffer)
@@ -38,10 +59,11 @@ func SaveConfig(config *Frontmatter) error {
 	}
 
 	// write config to disk
-	err := ioutil.WriteFile(configPath, buf.Bytes(), 0644)
+	file, err := c.Create()
 	if err != nil {
 		return err
 	}
 
-	return nil
+	_, err = buf.WriteTo(file)
+	return err
 }

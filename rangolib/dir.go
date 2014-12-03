@@ -7,37 +7,28 @@ import (
 	"path/filepath"
 )
 
-type File struct {
-	Name    string `json:"name"`
-	Path    string `json:"path"`
-	IsDir   bool   `json:"isDir"`
-	Size    int64  `json:"size"`
-	ModTime int64  `json:"modTime"`
+type DirManager interface {
+	Read(string) (Files, error)
+	Create(string) (*File, error)
+	Update(string, string) (*File, error)
+	Destroy(string) error
 }
 
-func (f *File) Load(info os.FileInfo) {
-	f.Name = info.Name()
-	f.IsDir = info.IsDir()
-	f.Size = info.Size()
-	f.ModTime = info.ModTime().Unix()
+type Dir struct{}
+
+func NewDir() *Dir {
+	return &Dir{}
 }
 
-// NewFile constructs a new File based on a path and file info
-func NewFile(path string, info os.FileInfo) *File {
-	file := &File{Path: path}
-	file.Load(info)
-	return file
-}
-
-// ReadDir lists the contents of a directory
-func ReadDir(dirname string) ([]*File, error) {
+// Read lists the contents of a directory
+func (d Dir) Read(dirname string) (Files, error) {
 	contents, err := ioutil.ReadDir(dirname)
 	if err != nil {
 		return nil, err
 	}
 
 	// make a new slice of File's to hold the dir contents
-	files := make([]*File, len(contents))
+	files := make(Files, len(contents))
 
 	// convert os.FileInfo into Files
 	for i, info := range contents {
@@ -47,8 +38,8 @@ func ReadDir(dirname string) ([]*File, error) {
 	return files, nil
 }
 
-// CreateDir creates a new directory
-func CreateDir(dirname string) (*File, error) {
+// Create creates a new directory
+func (d Dir) Create(dirname string) (*File, error) {
 
 	// make directory
 	if err := os.Mkdir(dirname, 0755); err != nil {
@@ -65,8 +56,8 @@ func CreateDir(dirname string) (*File, error) {
 	return NewFile(dirname, info), nil
 }
 
-// UpdateDir renames an existing directory
-func UpdateDir(src string, dest string) (*File, error) {
+// Update renames an existing directory
+func (d Dir) Update(src string, dest string) (*File, error) {
 
 	// check that destination doesn't exist
 	info, err := os.Stat(dest)
@@ -89,8 +80,8 @@ func UpdateDir(src string, dest string) (*File, error) {
 	return NewFile(dest, info), nil
 }
 
-// DeleteDir will delete a directory and it's contents
-func DeleteDir(dirname string) error {
+// Destroy will delete a directory and it's contents
+func (d Dir) Destroy(dirname string) error {
 
 	// check that directory exists
 	dir, err := os.Stat(dirname)

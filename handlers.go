@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -12,12 +14,18 @@ import (
 	"github.com/stayradiated/rango/rangolib"
 )
 
+type Handlers struct {
+	Config     rangolib.ConfigManager
+	Dir        rangolib.DirManager
+	ContentDir string
+}
+
 //  ┌┬┐┬┬─┐┌─┐┌─┐┌┬┐┌─┐┬─┐┬┌─┐┌─┐
 //   │││├┬┘├┤ │   │ │ │├┬┘│├┤ └─┐
 //  ─┴┘┴┴└─└─┘└─┘ ┴ └─┘┴└─┴└─┘└─┘
 
 type readDirResponse struct {
-	Data []*rangolib.File `json:"data"`
+	Data rangolib.Files `json:"data"`
 }
 
 type createDirResponse struct {
@@ -29,15 +37,16 @@ type updateDirResponse struct {
 }
 
 // readDir reads contents of a directory
-func readDir(w http.ResponseWriter, r *http.Request) {
-	fp, err := convertPath(mux.Vars(r)["path"])
+func (h Handlers) ReadDir(w http.ResponseWriter, r *http.Request) {
+	fp, err := h.convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
 	}
 
 	// try and read contents of dir
-	contents, err := rangolib.ReadDir(fp)
+	var contents rangolib.Files
+	contents, err = h.Dir.Read(fp)
 	if err != nil {
 		errDirNotFound.Write(w)
 		return
@@ -45,14 +54,14 @@ func readDir(w http.ResponseWriter, r *http.Request) {
 
 	// trim content prefix
 	for _, item := range contents {
-		item.Path = strings.TrimPrefix(item.Path, contentDir)
+		item.Path = strings.TrimPrefix(item.Path, h.ContentDir)
 	}
 
 	printJson(w, &readDirResponse{Data: contents})
 }
 
 // createDir creates a directory
-func createDir(w http.ResponseWriter, r *http.Request) {
+func (h Handlers) CreateDir(w http.ResponseWriter, r *http.Request) {
 
 	// combine parent and dirname
 	parent := mux.Vars(r)["path"]
@@ -60,7 +69,7 @@ func createDir(w http.ResponseWriter, r *http.Request) {
 	fp := filepath.Join(parent, dirname)
 
 	// check that it is a valid path
-	fp, err := convertPath(fp)
+	fp, err := h.convertPath(fp)
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -73,29 +82,29 @@ func createDir(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// make directory
-	dir, err := rangolib.CreateDir(fp)
+	dir, err := h.Dir.Create(fp)
 	if err != nil {
 		wrapError(err).Write(w)
 		return
 	}
 
 	// trim content prefix
-	dir.Path = strings.TrimPrefix(dir.Path, contentDir)
+	dir.Path = strings.TrimPrefix(dir.Path, h.ContentDir)
 
 	// print info
 	printJson(w, &createDirResponse{Dir: dir})
 }
 
 // updateDir renames a directory
-func updateDir(w http.ResponseWriter, r *http.Request) {
-	fp, err := convertPath(mux.Vars(r)["path"])
+func (h Handlers) UpdateDir(w http.ResponseWriter, r *http.Request) {
+	fp, err := h.convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
 	}
 
 	// check that the specified directory is not the root content folder
-	if fp == contentDir {
+	if fp == h.ContentDir {
 		errInvalidDir.Write(w)
 		return
 	}
@@ -112,7 +121,7 @@ func updateDir(w http.ResponseWriter, r *http.Request) {
 	dest := filepath.Join(parent, dirname)
 
 	// rename directory
-	dir, err := rangolib.UpdateDir(fp, dest)
+	dir, err := h.Dir.Update(fp, dest)
 	if err != nil {
 		wrapError(err).Write(w)
 		return
@@ -123,21 +132,21 @@ func updateDir(w http.ResponseWriter, r *http.Request) {
 }
 
 // destroyDir deletes a directory
-func destroyDir(w http.ResponseWriter, r *http.Request) {
-	fp, err := convertPath(mux.Vars(r)["path"])
+func (h Handlers) DestroyDir(w http.ResponseWriter, r *http.Request) {
+	fp, err := h.convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
 	}
 
 	// check that the specified directory is not the root content folder
-	if fp == contentDir {
+	if fp == h.ContentDir {
 		errInvalidDir.Write(w)
 		return
 	}
 
 	// remove directory
-	if err = rangolib.DeleteDir(fp); err != nil {
+	if err = h.Dir.Destroy(fp); err != nil {
 		errDirNotFound.Write(w)
 		return
 	}
@@ -162,8 +171,8 @@ type updatePageResponse struct {
 }
 
 // readPage reads page data
-func readPage(w http.ResponseWriter, r *http.Request) {
-	fp, err := convertPath(mux.Vars(r)["path"])
+func (h Handlers) ReadPage(w http.ResponseWriter, r *http.Request) {
+	fp, err := h.convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -177,15 +186,15 @@ func readPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// trim content prefix from path
-	page.Path = strings.TrimPrefix(page.Path, contentDir)
+	page.Path = strings.TrimPrefix(page.Path, h.ContentDir)
 
 	// print json
 	printJson(w, &readPageResponse{Page: page})
 }
 
 // createPage creates a new page
-func createPage(w http.ResponseWriter, r *http.Request) {
-	fp, err := convertPath(mux.Vars(r)["path"])
+func (h Handlers) CreatePage(w http.ResponseWriter, r *http.Request) {
+	fp, err := h.convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -218,14 +227,14 @@ func createPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// trim content prefix from path
-	page.Path = strings.TrimPrefix(page.Path, contentDir)
+	page.Path = strings.TrimPrefix(page.Path, h.ContentDir)
 
 	printJson(w, &createPageResponse{Page: page})
 }
 
 // updatePage writes page data to a file
-func updatePage(w http.ResponseWriter, r *http.Request) {
-	fp, err := convertPath(mux.Vars(r)["path"])
+func (h Handlers) UpdatePage(w http.ResponseWriter, r *http.Request) {
+	fp, err := h.convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -258,14 +267,14 @@ func updatePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// trim content prefix from path
-	page.Path = strings.TrimPrefix(page.Path, contentDir)
+	page.Path = strings.TrimPrefix(page.Path, h.ContentDir)
 
 	printJson(w, &updatePageResponse{Page: page})
 }
 
 // destroyPage deletes a page
-func destroyPage(w http.ResponseWriter, r *http.Request) {
-	fp, err := convertPath(mux.Vars(r)["path"])
+func (h Handlers) DestroyPage(w http.ResponseWriter, r *http.Request) {
+	fp, err := h.convertPath(mux.Vars(r)["path"])
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -286,8 +295,8 @@ func destroyPage(w http.ResponseWriter, r *http.Request) {
 //  └─┘└─┘┘└┘└  ┴└─┘
 
 // readConfig reads data from a config
-func readConfig(w http.ResponseWriter, r *http.Request) {
-	config, err := rangolib.ReadConfig()
+func (h Handlers) ReadConfig(w http.ResponseWriter, r *http.Request) {
+	config, err := h.Config.Parse()
 	if err != nil {
 		errNoConfig.Write(w)
 		return
@@ -297,10 +306,10 @@ func readConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // updateConfig writes json data to a config file
-func updateConfig(w http.ResponseWriter, r *http.Request) {
+func (h Handlers) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 
 	// parse the config
-	config := &rangolib.Frontmatter{}
+	config := &rangolib.ConfigMap{}
 	err := json.Unmarshal([]byte(r.FormValue("config")), config)
 	if err != nil {
 		errInvalidJson.Write(w)
@@ -308,7 +317,7 @@ func updateConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// save config
-	if err := rangolib.SaveConfig(config); err != nil {
+	if err := h.Config.Save(config); err != nil {
 		wrapError(err).Write(w)
 		return
 	}
@@ -321,7 +330,7 @@ func updateConfig(w http.ResponseWriter, r *http.Request) {
 //  ├─┤│ ││ ┬│ │
 //  ┴ ┴└─┘└─┘└─┘
 
-func publishSite(w http.ResponseWriter, r *http.Request) {
+func (h Handlers) PublishSite(w http.ResponseWriter, r *http.Request) {
 	output, err := rangolib.RunHugo()
 	if err != nil {
 		wrapError(err).Write(w)
@@ -334,15 +343,21 @@ func publishSite(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-//  ┌─┐┬┬  ┌─┐┌─┐
-//  ├┤ ││  ├┤ └─┐
-//  └  ┴┴─┘└─┘└─┘
+func (h Handlers) convertPath(p string) (string, error) {
+	err := errors.New("invalid path")
 
-// copy copies a page to a new file
-func copy(w http.ResponseWriter, r *http.Request) {
-	location := r.Header.Get("Content-Location")
-	vars := mux.Vars(r)
-	if len(location) > 0 {
-		fmt.Fprint(w, "Moving file from "+location+" to "+vars["path"])
+	// join path with content folder
+	fp := path.Join(h.ContentDir, p)
+
+	// check that path still starts with content dir
+	if !strings.HasPrefix(fp, h.ContentDir) {
+		return fp, err
 	}
+
+	// check that path doesn't contain any ..
+	if strings.Contains(fp, "..") {
+		return fp, err
+	}
+
+	return fp, nil
 }

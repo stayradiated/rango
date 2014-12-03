@@ -6,11 +6,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewRouter() *mux.Router {
+func NewRouter(handlers *Handlers) *mux.Router {
 	router := mux.NewRouter()
 
 	// load routes
-	for _, route := range routes {
+	for _, route := range GetRoutes(handlers) {
 		var handler http.Handler
 
 		handler = route.HandlerFunc

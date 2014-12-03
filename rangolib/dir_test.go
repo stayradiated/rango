@@ -10,33 +10,35 @@ import (
 
 type DirTestSuite struct {
 	suite.Suite
+	Dir Dir
 }
 
-func (assert *DirTestSuite) SetupTest() {
+func (t *DirTestSuite) SetupTest() {
+	t.Dir = Dir{}
 	os.Mkdir("content", 0755)
 }
 
-func (assert *DirTestSuite) TearDownTest() {
+func (t *DirTestSuite) TearDownTest() {
 	os.RemoveAll("content")
 }
 
 // test readdir on an empty directory
-func (assert *DirTestSuite) TestReadDirWithEmptyDir() {
-	files, err := ReadDir("content/")
-	assert.Nil(err)
-	assert.Equal(len(files), 0)
+func (t *DirTestSuite) TestReadDirWithEmptyDir() {
+	files, err := t.Dir.Read("content/")
+	t.Nil(err)
+	t.Equal(len(files), 0)
 }
 
 // test readdir on a single directory
-func (assert *DirTestSuite) TestReadDirWithSingleDir() {
+func (t *DirTestSuite) TestReadDirWithSingleDir() {
 	os.Mkdir("content/foo", 0755)
 	dirInfo, _ := os.Stat("content/foo")
 
-	files, err := ReadDir("content/")
-	assert.Nil(err)
-	assert.Equal(len(files), 1)
+	files, err := t.Dir.Read("content/")
+	t.Nil(err)
+	t.Equal(len(files), 1)
 
-	assert.Equal(files[0], &File{
+	t.Equal(files[0], &File{
 		Name:    "foo",
 		Path:    "content/foo",
 		IsDir:   true,
@@ -46,15 +48,15 @@ func (assert *DirTestSuite) TestReadDirWithSingleDir() {
 }
 
 // test readdir on a single file
-func (assert *DirTestSuite) TestReadDirWithSingleFile() {
+func (t *DirTestSuite) TestReadDirWithSingleFile() {
 	ioutil.WriteFile("content/bar.md", []byte(SIMPLE_PAGE), 0644)
 	fileInfo, err := os.Stat("content/bar.md")
 
-	files, err := ReadDir("content/")
-	assert.Nil(err)
-	assert.Equal(len(files), 1)
+	files, err := t.Dir.Read("content/")
+	t.Nil(err)
+	t.Equal(len(files), 1)
 
-	assert.Equal(files[0], &File{
+	t.Equal(files[0], &File{
 		Name:    "bar.md",
 		Path:    "content/bar.md",
 		IsDir:   false,
@@ -64,20 +66,20 @@ func (assert *DirTestSuite) TestReadDirWithSingleFile() {
 }
 
 // test readdir on a non-existant directory
-func (assert *DirTestSuite) TestReadDirWithMissingDir() {
-	files, err := ReadDir("does_not_exist/")
-	assert.Nil(files)
-	assert.NotNil(err)
+func (t *DirTestSuite) TestReadDirWithMissingDir() {
+	files, err := t.Dir.Read("does_not_exist/")
+	t.Nil(files)
+	t.NotNil(err)
 }
 
 // test createdir
-func (assert *DirTestSuite) TestCreateDir() {
-	dir, err := CreateDir("content/foo")
-	assert.Nil(err)
+func (t *DirTestSuite) TestCreateDir() {
+	dir, err := t.Dir.Create("content/foo")
+	t.Nil(err)
 
 	dirInfo, _ := os.Stat("content/foo")
 
-	assert.Equal(dir, &File{
+	t.Equal(dir, &File{
 		Name:    "foo",
 		Path:    "content/foo",
 		IsDir:   true,
@@ -87,36 +89,36 @@ func (assert *DirTestSuite) TestCreateDir() {
 }
 
 // test createdir on existing directory
-func (assert *DirTestSuite) TestCreateDirWithExistingDir() {
+func (t *DirTestSuite) TestCreateDirWithExistingDir() {
 	os.Mkdir("content/foo", 0755)
 
-	dir, err := CreateDir("content/foo")
-	assert.NotNil(err)
-	assert.Nil(dir)
+	dir, err := t.Dir.Create("content/foo")
+	t.NotNil(err)
+	t.Nil(dir)
 }
 
 // test updatedir on an existing directory with contents
-func (assert *DirTestSuite) TestUpdateDirWithExistingDir() {
+func (t *DirTestSuite) TestUpdateDirWithExistingDir() {
 	os.Mkdir("content/foo", 0755)
 	ioutil.WriteFile("content/foo/bar.md", []byte(SIMPLE_PAGE), 0644)
 
-	dir, err := UpdateDir("content/foo", "content/bar")
-	assert.Nil(err)
+	dir, err := t.Dir.Update("content/foo", "content/bar")
+	t.Nil(err)
 
 	_, err = os.Stat("content/foo")
-	assert.NotNil(err)
+	t.NotNil(err)
 
 	dirInfo, err := os.Stat("content/bar")
-	assert.Nil(err)
+	t.Nil(err)
 
 	_, err = os.Stat("content/bar/bar.md")
-	assert.Nil(err)
+	t.Nil(err)
 
 	bytes, err := ioutil.ReadFile("content/bar/bar.md")
-	assert.Nil(err)
-	assert.Equal(string(bytes), SIMPLE_PAGE)
+	t.Nil(err)
+	t.Equal(string(bytes), SIMPLE_PAGE)
 
-	assert.Equal(dir, &File{
+	t.Equal(dir, &File{
 		Name:    "bar",
 		Path:    "content/bar",
 		IsDir:   true,
@@ -126,41 +128,41 @@ func (assert *DirTestSuite) TestUpdateDirWithExistingDir() {
 }
 
 // test updatedir on a non-existant directory
-func (assert *DirTestSuite) TestUpdateDirOnMissingDir() {
-	dir, err := UpdateDir("content/foo", "content/bar")
-	assert.NotNil(err)
-	assert.Nil(dir)
+func (t *DirTestSuite) TestUpdateDirOnMissingDir() {
+	dir, err := t.Dir.Update("content/foo", "content/bar")
+	t.NotNil(err)
+	t.Nil(dir)
 }
 
 // test updatedir on a conflicting directory
-func (assert *DirTestSuite) TestUpdateDirOnConflictingDir() {
+func (t *DirTestSuite) TestUpdateDirOnConflictingDir() {
 	os.Mkdir("content/foo", 0755)
 	os.Mkdir("content/bar", 0755)
 
-	dir, err := UpdateDir("content/foo", "content/bar")
-	assert.NotNil(err)
-	assert.Nil(dir)
+	dir, err := t.Dir.Update("content/foo", "content/bar")
+	t.NotNil(err)
+	t.Nil(dir)
 }
 
 // test deletedir on an existing directory
-func (assert *DirTestSuite) TestDeleteDirWithExistingDir() {
+func (t *DirTestSuite) TestDestroyDirWithExistingDir() {
 	os.Mkdir("content/foo", 0755)
 
-	err := DeleteDir("content/foo")
-	assert.Nil(err)
+	err := t.Dir.Destroy("content/foo")
+	t.Nil(err)
 
 	_, err = os.Stat("content/foo")
-	assert.NotNil(err)
+	t.NotNil(err)
 }
 
 // test deletedir on a non-directory
-func (assert *DirTestSuite) TestDeleteDirWithMissingDir() {
-	err := DeleteDir("content/foo")
-	assert.NotNil(err)
+func (t *DirTestSuite) TestDestroyDirWithMissingDir() {
+	err := t.Dir.Destroy("content/foo")
+	t.NotNil(err)
 
 	ioutil.WriteFile("content/bar.md", []byte(SIMPLE_PAGE), 0644)
-	err = DeleteDir("content/bar.md")
-	assert.NotNil(err)
+	err = t.Dir.Destroy("content/bar.md")
+	t.NotNil(err)
 }
 
 func TestDirTestSuite(t *testing.T) {

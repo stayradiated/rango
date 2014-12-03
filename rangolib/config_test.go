@@ -11,40 +11,46 @@ import (
 const SIMPLE_CONFIG = `title = "Something Neat"
 `
 
-var simpleConfigData = &Frontmatter{
+var simpleConfigData = &ConfigMap{
 	"title": "Something Neat",
 }
 
 type ConfigTestSuite struct {
 	suite.Suite
+	Config Config
 }
 
-func (assert *ConfigTestSuite) SetupTest() {
-	configPath = "content/config.toml"
+func (t *ConfigTestSuite) SetupTest() {
+	t.Config = Config{
+		path: "./content/config.toml",
+	}
+
 	os.Mkdir("content", 0755)
 }
 
-func (assert *ConfigTestSuite) TearDownTest() {
+func (t *ConfigTestSuite) TearDownTest() {
 	os.RemoveAll("content")
 }
 
 // test ReadConfig on a simple config
-func (assert *ConfigTestSuite) TestReadConfig() {
-	ioutil.WriteFile("content/config.toml", []byte(SIMPLE_CONFIG), 0644)
+func (t *ConfigTestSuite) TestReadConfig() {
+	file, _ := t.Config.Create()
+	file.Write([]byte(SIMPLE_CONFIG))
 
-	config, err := ReadConfig()
-	assert.Nil(err)
-	assert.Equal(config, simpleConfigData)
+	config, err := t.Config.Parse()
+	t.Nil(err)
+	t.Equal(config, simpleConfigData)
 }
 
 // test SaveConfig on a simple config
-func (assert *ConfigTestSuite) TestSaveConfig() {
-	err := SaveConfig(simpleConfigData)
-	assert.Nil(err)
+func (t *ConfigTestSuite) TestSaveConfig() {
+	err := t.Config.Save(simpleConfigData)
+	t.Nil(err)
 
-	data, err := ioutil.ReadFile("content/config.toml")
-	assert.Nil(err)
-	assert.Equal(string(data), SIMPLE_CONFIG)
+	file, _ := t.Config.Open()
+	data, err := ioutil.ReadAll(file)
+	t.Nil(err)
+	t.Equal(string(data), SIMPLE_CONFIG)
 }
 
 // run config tests

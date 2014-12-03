@@ -3,11 +3,15 @@ package main
 import (
 	"log"
 	"net/http"
+
+	"github.com/stayradiated/rango/rangolib"
 )
 
-var contentDir = "content"
-
 func main() {
-	router := NewRouter()
+	router := NewRouter(&Handlers{
+		Config:     rangolib.NewConfig("config.toml"),
+		Dir:        rangolib.NewDir(),
+		ContentDir: "content",
+	})
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
