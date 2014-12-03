@@ -21,7 +21,7 @@ Hello World
 How are you today?
 `
 
-var simplePageData = &Page{
+var simplePageFile = &PageFile{
 	Path: "content/simple-page.md",
 	Metadata: Frontmatter{
 		"title": "Simple Page",
@@ -36,88 +36,90 @@ var simplePageData = &Page{
 
 type PageTestSuite struct {
 	suite.Suite
+	Page Page
 }
 
-func (assert *PageTestSuite) SetupTest() {
+func (t *PageTestSuite) SetupTest() {
+	t.Page = Page{}
 	os.Mkdir("content", 0755)
 }
 
-func (assert *PageTestSuite) TearDownTest() {
+func (t *PageTestSuite) TearDownTest() {
 	os.RemoveAll("content")
 }
 
 // test ReadPage on a simple page
-func (assert *PageTestSuite) TestReadPageOnSimplePage() {
+func (t *PageTestSuite) TestReadPageOnSimplePage() {
 	ioutil.WriteFile("content/simple-page.md", []byte(SIMPLE_PAGE), 0644)
 
-	page, err := ReadPage("content/simple-page.md")
-	assert.Nil(err)
-	assert.Equal(page, simplePageData)
+	page, err := t.Page.Read("content/simple-page.md")
+	t.Nil(err)
+	t.Equal(page, simplePageFile)
 }
 
 // test ReadPage on a missing page
-func (assert *PageTestSuite) TestReadPageOnMissingPage() {
-	page, err := ReadPage("content/simple-page.md")
-	assert.NotNil(err)
-	assert.Nil(page)
+func (t *PageTestSuite) TestReadPageOnMissingPage() {
+	page, err := t.Page.Read("content/simple-page.md")
+	t.NotNil(err)
+	t.Nil(page)
 }
 
 // test CreatePage on a simple page
-func (assert *PageTestSuite) TestCreatePageOnSimplePage() {
-	metadata := simplePageData.Metadata
-	content := []byte(simplePageData.Content)
+func (t *PageTestSuite) TestCreatePageOnSimplePage() {
+	metadata := simplePageFile.Metadata
+	content := []byte(simplePageFile.Content)
 
-	page, err := CreatePage("content/", metadata, content)
-	assert.Nil(err)
-	assert.Equal(page, simplePageData)
+	page, err := t.Page.Create("content/", metadata, content)
+	t.Nil(err)
+	t.Equal(page, simplePageFile)
 
 	data, err := ioutil.ReadFile("content/simple-page.md")
-	assert.Nil(err)
-	assert.Equal(string(data), SIMPLE_PAGE)
+	t.Nil(err)
+	t.Equal(string(data), SIMPLE_PAGE)
 }
 
 // test UpdatePage
-func (assert *PageTestSuite) TestUpdatePage() {
+func (t *PageTestSuite) TestUpdatePage() {
 	os.Create("content/old-page.md")
-	metadata := simplePageData.Metadata
-	content := []byte(simplePageData.Content)
+	metadata := simplePageFile.Metadata
+	content := []byte(simplePageFile.Content)
 
-	page, err := UpdatePage("content/old-page.md", metadata, content)
-	assert.Nil(err)
-	assert.Equal(page, simplePageData)
+	page, err := t.Page.Update("content/old-page.md", metadata, content)
+	t.Nil(err)
+	t.Equal(page, simplePageFile)
 
 	data, err := ioutil.ReadFile("content/simple-page.md")
-	assert.Nil(err)
-	assert.Equal(string(data), SIMPLE_PAGE)
+	t.Nil(err)
+	t.Equal(string(data), SIMPLE_PAGE)
 }
 
-// test DeletePage on a simple page
-func (assert *PageTestSuite) TestDeletePageOnSimplePage() {
+// test DestroyPage on a simple page
+func (t *PageTestSuite) TestDestroyPageOnSimplePage() {
 	os.Create("content/stuff.md")
-	err := DeletePage("content/stuff.md")
-	assert.Nil(err)
+	err := t.Page.Destroy("content/stuff.md")
+	t.Nil(err)
 }
 
-// test DeletePage on a missing page
-func (assert *PageTestSuite) TestDeletePageOnMissingPage() {
-	err := DeletePage("content/stuff.md")
-	assert.NotNil(err)
+// test DestroyPage on a missing page
+func (t *PageTestSuite) TestDestroyPageOnMissingPage() {
+	err := t.Page.Destroy("content/stuff.md")
+	t.NotNil(err)
 }
 
 // test generateFilePath against multiple cases
-func (assert *PageTestSuite) TestGenerateFilePath() {
+func (t *PageTestSuite) TestGenerateFilePath() {
 	var path string
 
 	path = generateFilePath("content/", "Super Simple")
-	assert.Equal(path, "content/super-simple.md")
+	t.Equal(path, "content/super-simple.md")
 
 	os.Create("content/super-simple.md")
 	path = generateFilePath("content/", "Super Simple")
-	assert.Equal(path, "content/super-simple-1.md")
+	t.Equal(path, "content/super-simple-1.md")
 
 	os.Create("content/super-simple-1.md")
 	path = generateFilePath("content/", "Super Simple")
-	assert.Equal(path, "content/super-simple-2.md")
+	t.Equal(path, "content/super-simple-2.md")
 }
 
 // Run tests

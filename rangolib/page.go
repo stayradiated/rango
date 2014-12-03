@@ -23,13 +23,13 @@ const YAML = '-'
 type Frontmatter map[string]interface{}
 
 // Page represents a markdown file
-type Page struct {
+type PageFile struct {
 	Path     string      `json:"path"`
 	Metadata Frontmatter `json:"metadata"`
 	Content  string      `json:"content"`
 }
 
-func (p *Page) Save() error {
+func (p *PageFile) Save() error {
 	// create new hugo page
 	page, err := hugolib.NewPage(p.Path)
 	if err != nil {
@@ -48,8 +48,21 @@ func (p *Page) Save() error {
 //  ├┤ │ │││││   │ ││ ││││└─┐
 //  └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘
 
+type PageManager interface {
+	Read(fp string) (*PageFile, error)
+	Create(fp string, fm Frontmatter, content []byte) (*PageFile, error)
+	Update(fp string, fm Frontmatter, content []byte) (*PageFile, error)
+	Destroy(fp string) error
+}
+
+type Page struct{}
+
+func NewPage() *Page {
+	return &Page{}
+}
+
 // ReadPage reads a page from disk
-func ReadPage(fp string) (*Page, error) {
+func (p Page) Read(fp string) (*PageFile, error) {
 	// open the file for reading
 	file, err := os.Open(fp)
 	if err != nil {
@@ -76,7 +89,7 @@ func ReadPage(fp string) (*Page, error) {
 	}
 
 	// assemble a new Page instance
-	return &Page{
+	return &PageFile{
 		Path:     fp,
 		Metadata: metadata,
 		Content:  string(parser.Content()),
@@ -84,10 +97,10 @@ func ReadPage(fp string) (*Page, error) {
 }
 
 // CreatePage creates a new file and saves page content to it
-func CreatePage(dirname string, metadata Frontmatter, content []byte) (*Page, error) {
+func (p Page) Create(dirname string, fm Frontmatter, content []byte) (*PageFile, error) {
 
 	// get title from metadata
-	title, err := getTitle(metadata)
+	title, err := getTitle(fm)
 	if err != nil {
 		return nil, err
 	}
@@ -96,9 +109,9 @@ func CreatePage(dirname string, metadata Frontmatter, content []byte) (*Page, er
 	fp := generateFilePath(dirname, title)
 
 	// create a new page
-	page := &Page{
+	page := &PageFile{
 		Path:     fp,
-		Metadata: metadata,
+		Metadata: fm,
 		Content:  string(content),
 	}
 
@@ -112,16 +125,16 @@ func CreatePage(dirname string, metadata Frontmatter, content []byte) (*Page, er
 }
 
 // UpdatePage changes the content of an existing page
-func UpdatePage(fp string, metadata Frontmatter, content []byte) (*Page, error) {
+func (p Page) Update(fp string, fm Frontmatter, content []byte) (*PageFile, error) {
 
 	// get title from metadata
-	title, err := getTitle(metadata)
+	title, err := getTitle(fm)
 	if err != nil {
 		return nil, err
 	}
 
 	// delete existing page
-	err = DeletePage(fp)
+	err = p.Destroy(fp)
 	if err != nil {
 		return nil, err
 	}
@@ -131,9 +144,9 @@ func UpdatePage(fp string, metadata Frontmatter, content []byte) (*Page, error) 
 	fp = generateFilePath(dirname, title)
 
 	// create a new page
-	page := &Page{
+	page := &PageFile{
 		Path:     fp,
-		Metadata: metadata,
+		Metadata: fm,
 		Content:  string(content),
 	}
 
@@ -146,8 +159,8 @@ func UpdatePage(fp string, metadata Frontmatter, content []byte) (*Page, error) 
 	return page, nil
 }
 
-// DeletePage deletes a page
-func DeletePage(fp string) error {
+// Destroy deletes a page
+func (p Page) Destroy(fp string) error {
 
 	// check that file exists
 	info, err := os.Stat(fp)
@@ -199,10 +212,10 @@ func generateFilePath(dirname, title string) (fp string) {
 	return fp
 }
 
-func getTitle(metadata Frontmatter) (string, error) {
+func getTitle(fm Frontmatter) (string, error) {
 
 	// check that title has been specified
-	t, ok := metadata["title"]
+	t, ok := fm["title"]
 	if ok == false {
 		return "", errors.New("page[meta].title must be specified")
 	}

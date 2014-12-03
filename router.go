@@ -8,6 +8,7 @@ import (
 
 func NewRouter(handlers *Handlers) *mux.Router {
 	router := mux.NewRouter()
+	apiRouter := router.PathPrefix("/api").Subrouter()
 
 	// load routes
 	for _, route := range GetRoutes(handlers) {
@@ -16,7 +17,7 @@ func NewRouter(handlers *Handlers) *mux.Router {
 		handler = route.HandlerFunc
 		handler = Logger(handler, route.Name)
 
-		router.
+		apiRouter.
 			Methods(route.Method).
 			Path(route.Pattern).
 			Name(route.Name).

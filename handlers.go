@@ -17,6 +17,7 @@ import (
 type Handlers struct {
 	Config     rangolib.ConfigManager
 	Dir        rangolib.DirManager
+	Page       rangolib.PageManager
 	ContentDir string
 }
 
@@ -159,15 +160,15 @@ func (h Handlers) DestroyDir(w http.ResponseWriter, r *http.Request) {
 //  ┴  ┴ ┴└─┘└─┘└─┘
 
 type readPageResponse struct {
-	Page *rangolib.Page `json:"page"`
+	Page *rangolib.PageFile `json:"page"`
 }
 
 type createPageResponse struct {
-	Page *rangolib.Page `json:"page"`
+	Page *rangolib.PageFile `json:"page"`
 }
 
 type updatePageResponse struct {
-	Page *rangolib.Page `json:"page"`
+	Page *rangolib.PageFile `json:"page"`
 }
 
 // readPage reads page data
@@ -179,7 +180,7 @@ func (h Handlers) ReadPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// read page from disk
-	page, err := rangolib.ReadPage(fp)
+	page, err := h.Page.Read(fp)
 	if err != nil {
 		errPageNotFound.Write(w)
 		return
@@ -220,7 +221,7 @@ func (h Handlers) CreatePage(w http.ResponseWriter, r *http.Request) {
 
 	content := []byte(r.FormValue("page[content]"))
 
-	page, err := rangolib.CreatePage(fp, metadata, content)
+	page, err := h.Page.Create(fp, metadata, content)
 	if err != nil {
 		wrapError(err).Write(w)
 		return
@@ -260,7 +261,7 @@ func (h Handlers) UpdatePage(w http.ResponseWriter, r *http.Request) {
 
 	content := []byte(r.FormValue("page[content]"))
 
-	page, err := rangolib.UpdatePage(fp, metadata, content)
+	page, err := h.Page.Update(fp, metadata, content)
 	if err != nil {
 		wrapError(err).Write(w)
 		return
@@ -281,7 +282,7 @@ func (h Handlers) DestroyPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// delete page
-	if err = rangolib.DeletePage(fp); err != nil {
+	if err = h.Page.Destroy(fp); err != nil {
 		errPageNotFound.Write(w)
 		return
 	}

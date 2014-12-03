@@ -16,47 +16,47 @@ func GetRoutes(h *Handlers) Routes {
 		// directories
 		Route{
 			"ReadDir",
-			"GET", "/api/dir/{path:.*}", h.ReadDir,
+			"GET", "/dir/{path:.*}", h.ReadDir,
 		},
 		Route{
 			"CreateDir",
-			"POST", "/api/dir/{path:.*}", h.CreateDir,
+			"POST", "/dir/{path:.*}", h.CreateDir,
 		},
 		Route{
 			"UpdateDir",
-			"PUT", "/api/dir/{path:.*}", h.UpdateDir,
+			"PUT", "/dir/{path:.*}", h.UpdateDir,
 		},
 		Route{
 			"DestroyDir",
-			"DELETE", "/api/dir/{path:.*}", h.DestroyDir,
+			"DELETE", "/dir/{path:.*}", h.DestroyDir,
 		},
 
 		// pages
 		Route{
 			"ReadPage",
-			"GET", "/api/page/{path:.*}", h.ReadPage,
+			"GET", "/page/{path:.*}", h.ReadPage,
 		},
 		Route{
 			"CreatePage",
-			"POST", "/api/page/{path:.*}", h.CreatePage,
+			"POST", "/page/{path:.*}", h.CreatePage,
 		},
 		Route{
 			"UpdatePage",
-			"PUT", "/api/page/{path:.*}", h.UpdatePage,
+			"PUT", "/page/{path:.*}", h.UpdatePage,
 		},
 		Route{
 			"DestroyPage",
-			"DELETE", "/api/page/{path:.*}", h.DestroyPage,
+			"DELETE", "/page/{path:.*}", h.DestroyPage,
 		},
 
 		// config
 		Route{
 			"ReadConfig",
-			"GET", "/api/config", h.ReadConfig,
+			"GET", "/config", h.ReadConfig,
 		},
 		Route{
 			"UpdateConfig",
-			"PUT", "/api/config", h.UpdateConfig,
+			"PUT", "/config", h.UpdateConfig,
 		},
 
 		// misc
