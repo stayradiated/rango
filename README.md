@@ -15,7 +15,7 @@ little computer experience.
 ```
 $ go get -u -v github.com/stayradiated/rango
 $ cd $GOPATH/src/github.com/stayradiated/rango
-$ cd client
+$ cd admin
 $ npm install
 $ gulp
 $ cd ..
