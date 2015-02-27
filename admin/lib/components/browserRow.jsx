@@ -25,7 +25,11 @@ var BrowserRow = React.createClass({
     var lastModified = moment(item.get('modTime') * 1000).format('LT ll');
     var isDir = item.get('isDir');
 
-    var icon = isDir ? '📁' : '📄';
+    var icon = isDir ? (
+      <span className='icon-folder' />
+    ) : (
+    <span className='icon-doc-text'/>
+    );
 
     var classes = classSet({
       selected: this.props.selected,

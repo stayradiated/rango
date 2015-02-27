@@ -96,8 +96,7 @@
     font-size: 15px;
   }
 
-  td.type {
-    font-family: 'entypo';
+  td.type .icon:before {
     font-size: 36px;
     color: $color_c;
     text-align: center;

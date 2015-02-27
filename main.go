@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -30,5 +31,6 @@ func main() {
 	})
 
 	// start http server
+	fmt.Println("Starting server on :8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
