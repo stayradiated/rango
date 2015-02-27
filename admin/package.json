@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/stayradiated/___",
   "dependencies": {
-    "codemirror": "^4.6.0",
+    "codemirror": "^4.8.0",
     "fastclick": "^1.0.6",
     "fluxxor": "^1.5.2",
     "immutable": "^3.6.2",
