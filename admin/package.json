@@ -17,11 +17,12 @@
   },
   "homepage": "https://github.com/stayradiated/___",
   "dependencies": {
-    "codemirror": "^4.8.0",
+    "codemirror": "^4.13.0",
     "fastclick": "^1.0.6",
     "fluxxor": "^1.5.2",
     "immutable": "^3.6.2",
     "jquery": "^2.1.3",
+    "lodash": "^3.3.1",
     "marked": "^0.3.3",
     "moment": "^2.9.0",
     "react": "^0.12.2",
