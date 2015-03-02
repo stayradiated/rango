@@ -2,6 +2,7 @@
 *.o
 *.a
 *.so
+/rango
 
 # Folders
 _obj
@@ -26,5 +27,7 @@ _testmain.go
 *.exe
 *.test
 
+# Hugo folders
 /content/**/*.md
-/rango
+/static
+/public

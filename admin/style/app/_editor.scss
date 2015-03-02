@@ -27,6 +27,31 @@ $sidebar_width: 300px;
   box-sizing: border-box;
 }
 
+.editor-images {
+  position: absolute;
+  overflow-y: auto;
+
+  top: 0;
+  left: $sidebar_width;
+  right: 0;
+  bottom: 0;
+
+  box-sizing: border-box;
+
+  .images {
+    padding: 20px;
+  }
+
+  .image {
+    @include column(1/4, $cycle: 4);
+
+    img {
+      width: 100%;
+      height: auto;
+    }
+  }
+}
+
 .editor-code {
   position: absolute;
   top: 0;
@@ -84,7 +109,7 @@ $sidebar_width: 300px;
   height: auto;
 
   color: $color_f0;
-  font-family: Menlo, monospace;
+  font-family: 'firamono', monospace;
   font-size: 14px;
   line-height: 24px;
   background: $color_bg;

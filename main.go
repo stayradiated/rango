@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/spf13/viper"
 	"github.com/stayradiated/rango/rangolib"
@@ -18,6 +19,14 @@ func main() {
 	// set config defaults
 	viper.SetDefault("ContentDir", "content")
 	viper.SetDefault("AdminDir", "admin")
+	viper.SetDefault("AssetsDir", "static/assets")
+
+	// make sure content dir exists
+	contentDir := viper.GetString("ContentDir")
+	_, err := os.Stat(contentDir)
+	if err != nil && os.IsNotExist(err) {
+		os.Mkdir(contentDir, 0755)
+	}
 
 	// create router
 	router := NewRouter(&RouterConfig{
@@ -25,9 +34,10 @@ func main() {
 			Config:     rangolib.NewConfig("config.toml"),
 			Dir:        rangolib.NewDir(),
 			Page:       rangolib.NewPage(),
-			ContentDir: viper.GetString("ContentDir"),
+			ContentDir: contentDir,
 		},
-		AdminDir: viper.GetString("AdminDir"),
+		AdminDir:  viper.GetString("AdminDir"),
+		AssetsDir: viper.GetString("AssetsDir"),
 	})
 
 	// start http server

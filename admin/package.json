@@ -26,6 +26,7 @@
     "marked": "^0.3.3",
     "moment": "^2.9.0",
     "react": "^0.12.2",
+    "react-anything-sortable": "^0.1.1",
     "react-code-mirror": "^3.0.3"
   },
   "devDependencies": {

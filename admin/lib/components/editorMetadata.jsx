@@ -8,6 +8,7 @@ var FluxMixin       = Fluxxor.FluxMixin(React);
 var InputText     = require('./inputText');
 var InputTextarea = require('./inputTextarea');
 var InputCheckbox = require('./inputCheckbox');
+var InputDropdown = require('./inputDropdown');
 
 var EditorMetadata = React.createClass({
   mixins: [
@@ -23,10 +24,26 @@ var EditorMetadata = React.createClass({
     var meta = this.props.metadata;
 
     var data = {
-      title: meta.get('title', ''),
-      description: meta.get('description', ''),
-      date: meta.get('date', ''),
-      type: meta.get('type', ''),
+      title: {
+        type: InputText,
+        value: meta.get('title', ''),
+      },
+      part: {
+        type: InputText,
+        value: meta.get('part', ''),
+      },
+      description: {
+        type: InputText,
+        value: meta.get('description', ''),
+      },
+      date: {
+        type: InputText,
+        value: meta.get('date', ''),
+      },
+      type: {
+        type: InputDropdown,
+        value: meta.get('type', ''),
+      },
     };
 
     // for (var key in meta) {
@@ -36,12 +53,12 @@ var EditorMetadata = React.createClass({
     var inputs = [];
     for (var key in data) {
       inputs.push(
-        <InputText
-          key={key}
-          label={key}
-          value={data[key]}
-          onChange={this.onChange.bind(this, key)}
-        />
+        React.createElement(data[key].type, {
+          key: key,
+          label: key,
+          value: data[key].value,
+          onChange: this.onChange.bind(this, key),
+        })
       );
     }
 
