@@ -10,6 +10,7 @@ var Sortable        = require('react-anything-sortable');
 var Immutable       = require('immutable');
 var Fluxxor         = require('fluxxor');
 var FluxMixin       = Fluxxor.FluxMixin(React);
+var Dropzone        = require('react-dropzone');
 
 var ImageItem    = require('./imageItem');
 var SortableItem = require('./sortableItem');
@@ -53,6 +54,11 @@ var EditorImages = React.createClass({
 
     return (
       <div className='editor-images'>
+
+        <Dropzone onDrop={this.handleDrop} size={150}>
+          <div>Add Images</div>
+        </Dropzone>
+
         <div className='images'>
           <Sortable key={key} onSort={this.handleSort}>
             {images}
@@ -81,6 +87,13 @@ var EditorImages = React.createClass({
       });
 
       this.getFlux().actions.update.metadata(meta);
+    }
+  },
+
+  handleDrop: function (files) {
+    for (var i = 0, len = files.length; i < len; i++) {
+      var file = files[i];
+      this.getFlux().actions.upload.file(file);
     }
   },
 

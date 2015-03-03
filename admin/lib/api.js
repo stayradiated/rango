@@ -97,7 +97,13 @@ _.extend(exports, {
   },
 
 
-  // Files
+  // Assets
+  
+  createAsset: function (file) {
+    var formData = new FormData();
+    formData.append('file', file);
+    return postForm('asset', 'random-path', formData);
+  },
 
   copy: function (src, dst) {
     return post('copy', src, { destination: dst });
@@ -125,6 +131,17 @@ function post (method, path, params) {
     url: Path.join(BASE_URL, method, path),
     dataType: 'json',
     data: params,
+  });
+}
+
+function postForm (method, path, formData) {
+  return jQuery.ajax({
+    type: 'post',
+    url: Path.join(BASE_URL, method, path),
+    data: formData,
+    cache: false,
+    contentType: false,
+    processData: false
   });
 }
 

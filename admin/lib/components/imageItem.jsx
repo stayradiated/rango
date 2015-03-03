@@ -16,9 +16,17 @@ var ImageItem = React.createClass({
       // <div className='image'>
       <div>
         <img src={'assets/' + path} alt='' />
-        <button onClick={this.props.onRemove}>Remove</button>
+        <button
+          onMouseDown={this.handleMouseDown}
+          onClick={this.props.onRemove}
+        >Remove</button>
       </div>
     );
+  },
+
+  handleMouseDown: function (event) {
+    // stop sortable from firing
+    event.stopPropagation();
   },
 
 });

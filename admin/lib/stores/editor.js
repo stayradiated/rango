@@ -13,10 +13,11 @@ var emptyPage = Immutable.fromJS({
 var EditorStore = Fluxxor.createStore({
 
   actions: {
-    OPEN_PAGE: 'handleOpenPage',
-    SAVE_PAGE: 'handleSavePage',
-    UPDATE_METADATA: 'handleUpdateMetadata',
-    UPDATE_CONTENT: 'handleUpdateContent',
+    OPEN_PAGE:        'handleOpenPage',
+    SAVE_PAGE:        'handleSavePage',
+    UPDATE_METADATA:  'handleUpdateMetadata',
+    UPDATE_CONTENT:   'handleUpdateContent',
+    UPLOAD_FILE:      'handleUploadFile',
   },
 
   initialize: function () {
@@ -86,6 +87,11 @@ var EditorStore = Fluxxor.createStore({
     this.state = this.state.setIn(['page', 'content'], content);
     this.state = this.state.set('hasChanged', true);
     this.emit('change');
+  },
+  
+  handleUploadFile: function (file) {
+    console.log('Uploading', file);
+    Rango.createAsset(file);
   },
 
 });

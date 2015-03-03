@@ -32,6 +32,9 @@ _.extend(exports, {
   publish: {
     site: dispatch('PUBLISH_SITE'),
   },
+  upload: {
+    file: dispatch('UPLOAD_FILE'),
+  },
 });
 
 function dispatch (event) {

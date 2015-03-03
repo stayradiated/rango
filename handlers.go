@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -325,6 +327,55 @@ func (h Handlers) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 
 	// don't need to send anything back
 	w.WriteHeader(http.StatusNoContent)
+}
+
+//  ┌─┐┌─┐┌─┐┌─┐┌┬┐┌─┐
+//  ├─┤└─┐└─┐├┤  │ └─┐
+//  ┴ ┴└─┘└─┘└─┘ ┴ └─┘
+
+// CreateAsset uploads a file into the assets directory
+func (h Handlers) CreateAsset(w http.ResponseWriter, r *http.Request) {
+
+	// get path of page that asset is related to
+	// fp, err := h.convertPath(mux.Vars(r)["path"])
+	// if err != nil {
+	// 	fmt.Fprint(w, err)
+	// 	return
+	// }
+
+	// Check page exists [optional]
+
+	// Create folder structure in assets folder
+	// Sanitize file name
+	// Check file name doesn't already exist
+
+	// Save file
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		fmt.Fprintln(w, err)
+		return
+	}
+	defer file.Close()
+
+	// TODO: save to path based on page name and sanitized file name
+	out, err := os.Create("/tmp/uploadedfile")
+	if err != nil {
+		fmt.Fprintf(w, "Unable to create the file for writing.")
+		return
+	}
+	defer out.Close()
+
+	// write the content from POST to the file
+	_, err = io.Copy(out, file)
+	if err != nil {
+		fmt.Fprintln(w, err)
+	}
+
+	// TODO: print out proper status message
+	fmt.Fprintf(w, "File uploaded successfully : ")
+	fmt.Fprintf(w, header.Filename)
+
+	// Write filename into page [optional]
 }
 
 //  ┬ ┬┬ ┬┌─┐┌─┐

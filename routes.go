@@ -59,6 +59,12 @@ func GetRoutes(h *Handlers) Routes {
 			"PUT", "/config", h.UpdateConfig,
 		},
 
+		// assets
+		Route{
+			"CreateAsset",
+			"POST", "/asset/{path:.*}", h.CreateAsset,
+		},
+
 		// misc
 		Route{
 			"PublishSite",
