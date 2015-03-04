@@ -28,6 +28,13 @@ func main() {
 		os.Mkdir(contentDir, 0755)
 	}
 
+	// make sure assets dir exists
+	assetsDir := viper.GetString("AssetsDir")
+	_, err = os.Stat(assetsDir)
+	if err != nil && os.IsNotExist(err) {
+		os.Mkdir(assetsDir, 0755)
+	}
+
 	// create router
 	router := NewRouter(&RouterConfig{
 		Handlers: &Handlers{
@@ -35,9 +42,9 @@ func main() {
 			Dir:        rangolib.NewDir(),
 			Page:       rangolib.NewPage(),
 			ContentDir: contentDir,
+			AssetsDir:  assetsDir,
 		},
-		AdminDir:  viper.GetString("AdminDir"),
-		AssetsDir: viper.GetString("AssetsDir"),
+		AdminDir: viper.GetString("AdminDir"),
 	})
 
 	// start http server

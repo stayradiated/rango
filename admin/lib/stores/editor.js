@@ -2,6 +2,7 @@
 
 var Immutable = require('immutable');
 var Fluxxor   = require('fluxxor');
+var path      = require('path');
 
 var Rango     = require('../api');
 
@@ -90,8 +91,26 @@ var EditorStore = Fluxxor.createStore({
   },
   
   handleUploadFile: function (file) {
-    console.log('Uploading', file);
-    Rango.createAsset(file);
+    var self = this;
+
+    Rango.createAsset(this.state.get('path'), file).then(function (result) {
+      // TODO: handle errors...
+      if (result.asset) {
+        var asset = result.asset;
+        var fullPath = path.join(asset.path, asset.name);
+
+        self.state = self.state.updateIn(['page', 'metadata', 'images'], function (images) {
+          if (images == null) {
+            images = Immutable.List();
+          }
+          images = images.push(fullPath);
+          return images;
+        });
+
+        self.state = self.state.set('hasChanged', true);
+        self.emit('change');
+      }
+    });
   },
 
 });

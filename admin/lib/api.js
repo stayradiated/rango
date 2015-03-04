@@ -99,10 +99,10 @@ _.extend(exports, {
 
   // Assets
   
-  createAsset: function (file) {
+  createAsset: function (path, file) {
     var formData = new FormData();
     formData.append('file', file);
-    return postForm('asset', 'random-path', formData);
+    return postForm('asset', path, formData);
   },
 
   copy: function (src, dst) {

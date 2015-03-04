@@ -7,9 +7,8 @@ import (
 )
 
 type RouterConfig struct {
-	Handlers  *Handlers
-	AdminDir  string
-	AssetsDir string
+	Handlers *Handlers
+	AdminDir string
 }
 
 func NewRouter(config *RouterConfig) *mux.Router {
@@ -31,7 +30,7 @@ func NewRouter(config *RouterConfig) *mux.Router {
 	}
 
 	// serve static assets (user images, etc)
-	assetsFs := http.FileServer(http.Dir(config.AssetsDir))
+	assetsFs := http.FileServer(http.Dir(config.Handlers.AssetsDir))
 	router.PathPrefix("/assets").Handler(http.StripPrefix("/assets/", assetsFs))
 
 	// serve admin client files (html, css, etc)

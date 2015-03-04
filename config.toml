@@ -1,8 +1,8 @@
 ContentDir = "content"
 
 # rango
-AdminDir = "./admin/dist"
-AssetsDir = "./static/assets"
+AdminDir = "admin/dist"
+AssetsDir = "static/assets"
 
 title = "That is awesome"
 

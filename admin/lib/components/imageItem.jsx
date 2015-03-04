@@ -15,7 +15,7 @@ var ImageItem = React.createClass({
     return (
       // <div className='image'>
       <div>
-        <img src={'assets/' + path} alt='' />
+        <img src={'assets' + path} alt='' />
         <button
           onMouseDown={this.handleMouseDown}
           onClick={this.props.onRemove}

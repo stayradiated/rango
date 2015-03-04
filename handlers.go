@@ -17,10 +17,12 @@ import (
 )
 
 type Handlers struct {
-	Config     rangolib.ConfigManager
-	Dir        rangolib.DirManager
-	Page       rangolib.PageManager
+	Config rangolib.ConfigManager
+	Dir    rangolib.DirManager
+	Page   rangolib.PageManager
+
 	ContentDir string
+	AssetsDir  string
 }
 
 //  ┌┬┐┬┬─┐┌─┐┌─┐┌┬┐┌─┐┬─┐┬┌─┐┌─┐
@@ -41,7 +43,7 @@ type updateDirResponse struct {
 
 // readDir reads contents of a directory
 func (h Handlers) ReadDir(w http.ResponseWriter, r *http.Request) {
-	fp, err := h.convertPath(mux.Vars(r)["path"])
+	fp, err := h.fixPathWithDir(mux.Vars(r)["path"], h.ContentDir)
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -72,7 +74,7 @@ func (h Handlers) CreateDir(w http.ResponseWriter, r *http.Request) {
 	fp := filepath.Join(parent, dirname)
 
 	// check that it is a valid path
-	fp, err := h.convertPath(fp)
+	fp, err := h.fixPathWithDir(fp, h.ContentDir)
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -100,7 +102,7 @@ func (h Handlers) CreateDir(w http.ResponseWriter, r *http.Request) {
 
 // updateDir renames a directory
 func (h Handlers) UpdateDir(w http.ResponseWriter, r *http.Request) {
-	fp, err := h.convertPath(mux.Vars(r)["path"])
+	fp, err := h.fixPathWithDir(mux.Vars(r)["path"], h.ContentDir)
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -136,7 +138,7 @@ func (h Handlers) UpdateDir(w http.ResponseWriter, r *http.Request) {
 
 // destroyDir deletes a directory
 func (h Handlers) DestroyDir(w http.ResponseWriter, r *http.Request) {
-	fp, err := h.convertPath(mux.Vars(r)["path"])
+	fp, err := h.fixPathWithDir(mux.Vars(r)["path"], h.ContentDir)
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -175,7 +177,7 @@ type updatePageResponse struct {
 
 // readPage reads page data
 func (h Handlers) ReadPage(w http.ResponseWriter, r *http.Request) {
-	fp, err := h.convertPath(mux.Vars(r)["path"])
+	fp, err := h.fixPathWithDir(mux.Vars(r)["path"], h.ContentDir)
 	if err != nil {
 		errInvalidDir.Write(w)
 		return
@@ -197,7 +199,7 @@ func (h Handlers) ReadPage(w http.ResponseWriter, r *http.Request) {
 
 // createPage creates a new page
 func (h Handlers) CreatePage(w http.ResponseWriter, r *http.Request) {
-	fp, err := h.convertPath(mux.Vars(r)["path"])
+	fp, err := h.fixPathWithDir(mux.Vars(r)["path"], h.ContentDir)
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -237,7 +239,7 @@ func (h Handlers) CreatePage(w http.ResponseWriter, r *http.Request) {
 
 // updatePage writes page data to a file
 func (h Handlers) UpdatePage(w http.ResponseWriter, r *http.Request) {
-	fp, err := h.convertPath(mux.Vars(r)["path"])
+	fp, err := h.fixPathWithDir(mux.Vars(r)["path"], h.ContentDir)
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -277,7 +279,7 @@ func (h Handlers) UpdatePage(w http.ResponseWriter, r *http.Request) {
 
 // destroyPage deletes a page
 func (h Handlers) DestroyPage(w http.ResponseWriter, r *http.Request) {
-	fp, err := h.convertPath(mux.Vars(r)["path"])
+	fp, err := h.fixPathWithDir(mux.Vars(r)["path"], h.ContentDir)
 	if err != nil {
 		fmt.Fprint(w, err)
 		return
@@ -333,23 +335,30 @@ func (h Handlers) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 //  ├─┤└─┐└─┐├┤  │ └─┐
 //  ┴ ┴└─┘└─┘└─┘ ┴ └─┘
 
+type createAssetResponse struct {
+	Asset *rangolib.Asset `json:"asset"`
+}
+
 // CreateAsset uploads a file into the assets directory
 func (h Handlers) CreateAsset(w http.ResponseWriter, r *http.Request) {
 
-	// get path of page that asset is related to
-	// fp, err := h.convertPath(mux.Vars(r)["path"])
-	// if err != nil {
-	// 	fmt.Fprint(w, err)
-	// 	return
-	// }
+	// get path to store file in
+	dir, err := h.fixPathWithDir(mux.Vars(r)["path"], h.AssetsDir)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
 
 	// Check page exists [optional]
 
-	// Create folder structure in assets folder
-	// Sanitize file name
-	// Check file name doesn't already exist
+	// Remove .md extension
+	ext := path.Ext(dir)
+	dir = dir[0 : len(dir)-len(ext)]
 
-	// Save file
+	// Create folder structure in assets folder
+	os.MkdirAll(dir, 0755)
+
+	// Get file form request
 	file, header, err := r.FormFile("file")
 	if err != nil {
 		fmt.Fprintln(w, err)
@@ -357,8 +366,14 @@ func (h Handlers) CreateAsset(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
+	// Sanitize file name
+	filename := sanitize.Path(header.Filename)
+	fp := path.Join(dir, filename)
+
+	// Check file name doesn't already exist
+
 	// TODO: save to path based on page name and sanitized file name
-	out, err := os.Create("/tmp/uploadedfile")
+	out, err := os.Create(fp)
 	if err != nil {
 		fmt.Fprintf(w, "Unable to create the file for writing.")
 		return
@@ -371,9 +386,17 @@ func (h Handlers) CreateAsset(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, err)
 	}
 
+	asset := &rangolib.Asset{
+		Name: filename,
+		Path: dir,
+	}
+
+	asset.Resample()
+
+	asset.Path = strings.TrimPrefix(asset.Path, h.AssetsDir)
+
 	// TODO: print out proper status message
-	fmt.Fprintf(w, "File uploaded successfully : ")
-	fmt.Fprintf(w, header.Filename)
+	printJson(w, &createAssetResponse{Asset: asset})
 
 	// Write filename into page [optional]
 }
@@ -395,14 +418,16 @@ func (h Handlers) PublishSite(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h Handlers) convertPath(p string) (string, error) {
+func (h Handlers) fixPathWithDir(p string, dir string) (string, error) {
 	err := errors.New("invalid path")
 
 	// join path with content folder
-	fp := path.Join(h.ContentDir, p)
+	fp := path.Join(dir, p)
+
+	fmt.Println(fp)
 
 	// check that path still starts with content dir
-	if !strings.HasPrefix(fp, h.ContentDir) {
+	if !strings.HasPrefix(fp, dir) {
 		return fp, err
 	}
 
